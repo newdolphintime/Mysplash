@@ -4,42 +4,40 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common._basic.Tag;
-import com.wangdaye.mysplash._common.data.entity.unsplash.Photo;
-import com.wangdaye.mysplash._common._basic.MysplashActivity;
-import com.wangdaye.mysplash._common.ui.adapter.PhotoInfoAdapter;
-import com.wangdaye.mysplash._common.ui.adapter.TagAdapter;
+import com.wangdaye.mysplash.common._basic.Tag;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Photo;
+import com.wangdaye.mysplash.common._basic.MysplashActivity;
+import com.wangdaye.mysplash.common.ui.adapter.PhotoInfoAdapter;
+import com.wangdaye.mysplash.common.ui.adapter.TagAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Tag holder.
  * */
 
 public class TagHolder extends PhotoInfoAdapter.ViewHolder {
-    // widget
-    private RecyclerView recyclerView;
 
-    // data
+    @BindView(R.id.item_photo_tag)
+    RecyclerView recyclerView;
+
     public static final int TYPE_TAG = 6;
 
-    /** <br> life cycle. */
-
-    public TagHolder(View itemView) {
+    public TagHolder(View itemView, MysplashActivity a) {
         super(itemView);
+        ButterKnife.bind(this, itemView);
 
-        this.recyclerView = (RecyclerView) itemView.findViewById(R.id.item_photo_tag);
         recyclerView.setLayoutManager(
                 new LinearLayoutManager(
-                        Mysplash.getInstance().getTopActivity(),
+                        a,
                         LinearLayoutManager.HORIZONTAL,
                         false));
     }
-
-    /** <br> life cycle. */
 
     @Override
     protected void onBindView(MysplashActivity a, Photo photo) {
@@ -55,6 +53,11 @@ public class TagHolder extends PhotoInfoAdapter.ViewHolder {
             }
         }
         recyclerView.setAdapter(new TagAdapter(a, tagList));
+    }
+
+    @Override
+    protected void onRecycled() {
+        // do nothing.
     }
 
     public void setScrollListener(RecyclerView.OnScrollListener listener) {

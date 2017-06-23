@@ -2,12 +2,12 @@ package com.wangdaye.mysplash.photo.presenter;
 
 import android.content.Context;
 
-import com.wangdaye.mysplash._common.data.entity.unsplash.Photo;
-import com.wangdaye.mysplash._common.data.service.PhotoInfoService;
-import com.wangdaye.mysplash._common.i.model.PhotoInfoModel;
-import com.wangdaye.mysplash._common.i.presenter.PhotoInfoPresenter;
-import com.wangdaye.mysplash._common.i.view.PhotoInfoView;
-import com.wangdaye.mysplash._common.ui.adapter.PhotoInfoAdapter;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Photo;
+import com.wangdaye.mysplash.common.data.service.PhotoInfoService;
+import com.wangdaye.mysplash.common.i.model.PhotoInfoModel;
+import com.wangdaye.mysplash.common.i.presenter.PhotoInfoPresenter;
+import com.wangdaye.mysplash.common.i.view.PhotoInfoView;
+import com.wangdaye.mysplash.common.ui.adapter.PhotoInfoAdapter;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -18,21 +18,15 @@ import retrofit2.Response;
 
 public class PhotoInfoImplementor
         implements PhotoInfoPresenter {
-    // model & view.
+
     private PhotoInfoModel model;
     private PhotoInfoView view;
-
-    // data
     private OnRequestPhotoDetailsListener listener;
-
-    /** <br> life cycle. */
 
     public PhotoInfoImplementor(PhotoInfoModel model, PhotoInfoView view) {
         this.model = model;
         this.view = view;
     }
-
-    /** <br> presenter. */
 
     @Override
     public void requestPhoto(Context context) {
@@ -75,26 +69,20 @@ public class PhotoInfoImplementor
         model.setFailed(b);
     }
 
-    /** <br> interface. */
+    // interface.
 
     private class OnRequestPhotoDetailsListener
             implements PhotoInfoService.OnRequestSinglePhotoListener {
-        // data
-        private boolean canceled;
 
-        // life cycle.
+        private boolean canceled;
 
         OnRequestPhotoDetailsListener() {
             this.canceled = false;
         }
 
-        // data.
-
         public void cancel() {
             this.canceled = true;
         }
-
-        // interface.
 
         @Override
         public void onRequestSinglePhotoSuccess(Call<Photo> call, Response<Photo> response) {

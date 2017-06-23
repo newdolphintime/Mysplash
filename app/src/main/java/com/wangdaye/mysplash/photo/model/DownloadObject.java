@@ -1,7 +1,7 @@
 package com.wangdaye.mysplash.photo.model;
 
-import com.wangdaye.mysplash._common.data.entity.unsplash.Photo;
-import com.wangdaye.mysplash._common.i.model.DownloadModel;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Photo;
+import com.wangdaye.mysplash.common.i.model.DownloadModel;
 
 /**
  * Download object.
@@ -9,16 +9,12 @@ import com.wangdaye.mysplash._common.i.model.DownloadModel;
 
 public class DownloadObject
         implements DownloadModel {
-    // data
-    private Photo photo;
 
-    /** <br> life cycle. */
+    private Photo photo;
 
     public DownloadObject(Photo p) {
         this.photo = p;
     }
-
-    /** <br> model. */
 
     @Override
     public Object getDownloadKey() {

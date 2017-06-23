@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.wangdaye.mysplash._common.data.service.CollectionService;
-import com.wangdaye.mysplash._common.i.model.BrowsableModel;
+import com.wangdaye.mysplash.common.data.service.CollectionService;
+import com.wangdaye.mysplash.common.i.model.BrowsableModel;
 import com.wangdaye.mysplash.collection.view.activity.CollectionActivity;
 
 import java.util.List;
@@ -16,11 +16,9 @@ import java.util.List;
 
 public class BorwsableObject
         implements BrowsableModel {
-    // data
+
     private Uri intentUri;
     private CollectionService service;
-
-    /** <br> life cycle. */
 
     public BorwsableObject(Intent intent) {
         if (intent.getDataString() == null) {
@@ -28,19 +26,17 @@ public class BorwsableObject
             if (TextUtils.isEmpty(id)) {
                 intentUri = null;
             } else {
-                intentUri = Uri.parse("https://unsplash.com/collections/curated/" + id);
+                int collectionId = Integer.parseInt(id);
+                if (collectionId < 1000) {
+                    intentUri = Uri.parse("https://unsplash.com/collections/curated/" + id);
+                } else {
+                    intentUri = Uri.parse("https://unsplash.com/collections/" + id);
+                }
             }
         } else {
             intentUri = Uri.parse(intent.getDataString());
         }
         service = CollectionService.getService();
-    }
-
-    /** <br> model. */
-
-    @Override
-    public Uri getIntentUri() {
-        return intentUri;
     }
 
     @Override
@@ -49,17 +45,17 @@ public class BorwsableObject
     }
 
     @Override
-    public String getBrowsableDataKey() {
-        List<String> segmentList = intentUri.getPathSegments();
-        StringBuilder result = new StringBuilder(segmentList.get(0));
-        for (int i = 1; i < segmentList.size(); i ++) {
-            result.append(",").append(segmentList.get(i));
-        }
-        return result.toString();
+    public Object getService() {
+        return service;
     }
 
     @Override
-    public Object getService() {
-        return service;
+    public Uri getIntentUri() {
+        return intentUri;
+    }
+
+    @Override
+    public List<String> getBrowsableDataKey() {
+        return intentUri.getPathSegments();
     }
 }

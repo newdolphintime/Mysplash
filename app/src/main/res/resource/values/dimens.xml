@@ -5,6 +5,10 @@
     <dimen name="tab_layout_height">48dp</dimen>
     <dimen name="mini_loading_view_height">80dp</dimen>
     <dimen name="user_cover_view_height">240dp</dimen>
+    <dimen name="photo_info_base_view_height">300dp</dimen>
+    <dimen name="tablet_download_button_bar_width">386dp</dimen>
+    <dimen name="item_photo_more_vertical_height">72dp</dimen>
+    <dimen name="select_collection_dialog_height">320dp</dimen>
 
     <!-- text -->
     <dimen name="design_title_text_size">24sp</dimen>
@@ -27,5 +31,11 @@
     <dimen name="little_margin">8dp</dimen>
     <dimen name="mini_margin">4dp</dimen>
     <dimen name="nano_margin">2dp</dimen>
+
+    <!-- elevation. -->
+    <dimen name="tiny_elevation">1dp</dimen>
+    <dimen name="low_elevation">2dp</dimen>
+    <dimen name="middle_elevation">4dp</dimen>
+    <dimen name="high_elevation">10dp</dimen>
 
 </resources>

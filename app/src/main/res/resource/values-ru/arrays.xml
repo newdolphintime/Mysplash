@@ -53,12 +53,13 @@
 
     <!-- download type. -->
     <string-array name="download_types">
+        <item>Tiny</item>
         <item>Сжатый</item>
         <item>Исходный</item>
     </string-array>
 
     <!-- back to top. -->
-    <string-array name="back_to_top_type">
+    <string-array name="back_to_top_types">
         <item>Все списки</item>
         <item>Только на главную</item>
         <item>Ничего</item>

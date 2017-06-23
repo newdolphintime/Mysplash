@@ -1,11 +1,11 @@
 package com.wangdaye.mysplash.user.presenter.widget;
 
-import com.wangdaye.mysplash._common.data.entity.unsplash.User;
-import com.wangdaye.mysplash._common.data.service.FollowingService;
-import com.wangdaye.mysplash._common.data.service.UserService;
-import com.wangdaye.mysplash._common.i.model.UserModel;
-import com.wangdaye.mysplash._common.i.presenter.UserPresenter;
-import com.wangdaye.mysplash._common.i.view.UserView;
+import com.wangdaye.mysplash.common.data.entity.unsplash.User;
+import com.wangdaye.mysplash.common.data.service.FollowingService;
+import com.wangdaye.mysplash.common.data.service.UserService;
+import com.wangdaye.mysplash.common.i.model.UserModel;
+import com.wangdaye.mysplash.common.i.presenter.UserPresenter;
+import com.wangdaye.mysplash.common.i.view.UserView;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -17,22 +17,17 @@ import retrofit2.Response;
 
 public class UserImplementor
         implements UserPresenter {
-    // model & view.
+
     private UserModel model;
     private UserView view;
 
-    // data
     private OnRequestUserProfileListener requestUserProfileListener;
     private OnFollowListener followListener;
-
-    /** <br> life cycle. */
 
     public UserImplementor(UserModel model, UserView view) {
         this.model = model;
         this.view = view;
     }
-
-    /** <br> presenter. */
 
     @Override
     public void requestUser() {
@@ -62,7 +57,7 @@ public class UserImplementor
             followListener.cancel();
         }
         model.getUserService().cancel();
-        model.getFollowingService().cancel();
+        // model.getFollowingService().cancel();
     }
 
     @Override
@@ -75,12 +70,12 @@ public class UserImplementor
         return model.getUser();
     }
 
-    /** <br> interface. */
+    // interface.
 
     // on request user profile swipeListener.
 
     private class OnRequestUserProfileListener implements UserService.OnRequestUserProfileListener {
-        // data
+
         private boolean canceled;
 
         OnRequestUserProfileListener() {
@@ -118,7 +113,7 @@ public class UserImplementor
     // on follow swipeListener.
 
     private class OnFollowListener implements FollowingService.OnFollowListener {
-        // data
+
         private boolean canceled;
 
         OnFollowListener() {

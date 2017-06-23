@@ -2,26 +2,22 @@ package com.wangdaye.mysplash.user.presenter.activity;
 
 import android.content.Context;
 
-import com.wangdaye.mysplash._common.data.entity.unsplash.Photo;
-import com.wangdaye.mysplash._common.i.model.DownloadModel;
-import com.wangdaye.mysplash._common.i.presenter.DownloadPresenter;
-import com.wangdaye.mysplash._common.utils.helper.DownloadHelper;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Photo;
+import com.wangdaye.mysplash.common.i.model.DownloadModel;
+import com.wangdaye.mysplash.common.i.presenter.DownloadPresenter;
+import com.wangdaye.mysplash.common.utils.helper.DownloadHelper;
 
 /**
  * Download implementor.
  * */
 
 public class DownloadImplementor implements DownloadPresenter {
-    // model & view.
-    private DownloadModel model;
 
-    /** <br> life cycle. */
+    private DownloadModel model;
 
     public DownloadImplementor(DownloadModel model) {
         this.model = model;
     }
-
-    /** <br> presenter. */
 
     @Override
     public void download(Context context) {

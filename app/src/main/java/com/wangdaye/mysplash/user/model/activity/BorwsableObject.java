@@ -3,9 +3,8 @@ package com.wangdaye.mysplash.user.model.activity;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.wangdaye.mysplash._common.data.service.CollectionService;
-import com.wangdaye.mysplash._common.data.service.UserService;
-import com.wangdaye.mysplash._common.i.model.BrowsableModel;
+import com.wangdaye.mysplash.common.data.service.UserService;
+import com.wangdaye.mysplash.common.i.model.BrowsableModel;
 
 import java.util.List;
 
@@ -15,11 +14,9 @@ import java.util.List;
 
 public class BorwsableObject
         implements BrowsableModel {
-    // data
+
     private Uri intentUri;
     private UserService service;
-
-    /** <br> life cycle. */
 
     public BorwsableObject(Intent intent) {
         if (intent.getDataString() == null) {
@@ -29,8 +26,6 @@ public class BorwsableObject
         }
         service = UserService.getService();
     }
-
-    /** <br> model. */
 
     @Override
     public Uri getIntentUri() {
@@ -43,13 +38,8 @@ public class BorwsableObject
     }
 
     @Override
-    public String getBrowsableDataKey() {
-        List<String> segmentList = intentUri.getPathSegments();
-        StringBuilder result = new StringBuilder(segmentList.get(0));
-        for (int i = 1; i < segmentList.size(); i ++) {
-            result.append(",").append(segmentList.get(i));
-        }
-        return result.toString();
+    public List<String> getBrowsableDataKey() {
+        return intentUri.getPathSegments();
     }
 
     @Override

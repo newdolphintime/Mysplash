@@ -1,16 +1,20 @@
 package com.wangdaye.mysplash.main.model.widget;
 
-import com.wangdaye.mysplash._common.data.service.PhotoService;
-import com.wangdaye.mysplash._common.i.model.MultiFilterModel;
-import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
+import com.wangdaye.mysplash.common.data.service.PhotoService;
+import com.wangdaye.mysplash.common.i.model.MultiFilterModel;
+import com.wangdaye.mysplash.common.ui.adapter.PhotoAdapter;
 
 /**
  * Multi-filter object.
+ *
+ * A {@link MultiFilterModel} for
+ * {@link com.wangdaye.mysplash.main.view.widget.MultiFilterPhotosView}.
+ *
  * */
 
 public class MultiFilterObject
         implements MultiFilterModel {
-    // data
+
     private PhotoAdapter adapter;
     private PhotoService service;
 
@@ -23,8 +27,6 @@ public class MultiFilterObject
     private boolean refreshing;
     private boolean loading;
     private boolean over;
-
-    /** <br> life cycle. */
 
     public MultiFilterObject(PhotoAdapter a) {
         this.adapter = a;
@@ -40,8 +42,6 @@ public class MultiFilterObject
         this.loading = false;
         this.over = false;
     }
-
-    /** <br> model. */
 
     @Override
     public PhotoAdapter getAdapter() {

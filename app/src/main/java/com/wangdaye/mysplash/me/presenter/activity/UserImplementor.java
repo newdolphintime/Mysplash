@@ -1,11 +1,11 @@
 package com.wangdaye.mysplash.me.presenter.activity;
 
-import com.wangdaye.mysplash._common.data.entity.unsplash.User;
-import com.wangdaye.mysplash._common.data.service.UserService;
-import com.wangdaye.mysplash._common.i.model.UserModel;
-import com.wangdaye.mysplash._common.i.presenter.UserPresenter;
-import com.wangdaye.mysplash._common.i.view.UserView;
-import com.wangdaye.mysplash._common.utils.manager.AuthManager;
+import com.wangdaye.mysplash.common.data.entity.unsplash.User;
+import com.wangdaye.mysplash.common.data.service.UserService;
+import com.wangdaye.mysplash.common.i.model.UserModel;
+import com.wangdaye.mysplash.common.i.presenter.UserPresenter;
+import com.wangdaye.mysplash.common.i.view.UserView;
+import com.wangdaye.mysplash.common.utils.manager.AuthManager;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -16,21 +16,16 @@ import retrofit2.Response;
 
 public class UserImplementor
         implements UserPresenter {
-    // model & view.
+
     private UserModel model;
     private UserView view;
 
-    // data
     private OnRequestUserProfileListener requestUserProfileListener;
-
-    /** <br> life cycle. */
 
     public UserImplementor(UserModel model, UserView view) {
         this.model = model;
         this.view = view;
     }
-
-    /** <br> presenter. */
 
     @Override
     public void requestUser() {
@@ -68,7 +63,7 @@ public class UserImplementor
         return model.getUser();
     }
 
-    /** <br> interface. */
+    // interface.
 
     // on request user profile swipeListener.
 

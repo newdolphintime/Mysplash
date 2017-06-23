@@ -4,13 +4,11 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -18,28 +16,29 @@ import android.widget.TextView;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.data.entity.unsplash.Collection;
-import com.wangdaye.mysplash._common.data.entity.unsplash.Photo;
-import com.wangdaye.mysplash._common.data.entity.unsplash.User;
-import com.wangdaye.mysplash._common.i.model.LoadModel;
-import com.wangdaye.mysplash._common.i.model.PhotosModel;
-import com.wangdaye.mysplash._common.i.model.ScrollModel;
-import com.wangdaye.mysplash._common.i.presenter.LoadPresenter;
-import com.wangdaye.mysplash._common.i.presenter.PagerPresenter;
-import com.wangdaye.mysplash._common.i.presenter.PhotosPresenter;
-import com.wangdaye.mysplash._common.i.presenter.ScrollPresenter;
-import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
-import com.wangdaye.mysplash._common.ui.dialog.SelectCollectionDialog;
-import com.wangdaye.mysplash._common.ui.widget.nestedScrollView.NestedScrollFrameLayout;
-import com.wangdaye.mysplash._common.ui.widget.swipeRefreshView.BothWaySwipeRefreshLayout;
-import com.wangdaye.mysplash._common.utils.AnimUtils;
-import com.wangdaye.mysplash._common.utils.BackToTopUtils;
-import com.wangdaye.mysplash._common.i.view.LoadView;
-import com.wangdaye.mysplash._common.i.view.PagerView;
-import com.wangdaye.mysplash._common.i.view.PhotosView;
-import com.wangdaye.mysplash._common.i.view.ScrollView;
-import com.wangdaye.mysplash._common.utils.DisplayUtils;
-import com.wangdaye.mysplash._common.utils.helper.ImageHelper;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Collection;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Photo;
+import com.wangdaye.mysplash.common.data.entity.unsplash.User;
+import com.wangdaye.mysplash.common.i.model.LoadModel;
+import com.wangdaye.mysplash.common.i.model.PhotosModel;
+import com.wangdaye.mysplash.common.i.model.ScrollModel;
+import com.wangdaye.mysplash.common.i.presenter.LoadPresenter;
+import com.wangdaye.mysplash.common.i.presenter.PagerPresenter;
+import com.wangdaye.mysplash.common.i.presenter.PhotosPresenter;
+import com.wangdaye.mysplash.common.i.presenter.ScrollPresenter;
+import com.wangdaye.mysplash.common.ui.adapter.PhotoAdapter;
+import com.wangdaye.mysplash.common.ui.dialog.SelectCollectionDialog;
+import com.wangdaye.mysplash.common.ui.widget.nestedScrollView.NestedScrollFrameLayout;
+import com.wangdaye.mysplash.common.ui.widget.swipeRefreshView.BothWaySwipeRefreshLayout;
+import com.wangdaye.mysplash.common.utils.AnimUtils;
+import com.wangdaye.mysplash.common.utils.BackToTopUtils;
+import com.wangdaye.mysplash.common.i.view.LoadView;
+import com.wangdaye.mysplash.common.i.view.PagerView;
+import com.wangdaye.mysplash.common.i.view.PhotosView;
+import com.wangdaye.mysplash.common.i.view.ScrollView;
+import com.wangdaye.mysplash.common.utils.DisplayUtils;
+import com.wangdaye.mysplash.common.utils.helper.ImageHelper;
+import com.wangdaye.mysplash.common.utils.manager.ThemeManager;
 import com.wangdaye.mysplash.main.model.widget.LoadObject;
 import com.wangdaye.mysplash.main.model.widget.PhotosObject;
 import com.wangdaye.mysplash.main.model.widget.ScrollObject;
@@ -52,122 +51,137 @@ import com.wangdaye.mysplash.main.view.activity.MainActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Home photos view.
+ *
+ * This view is used to show photos for
+ * {@link com.wangdaye.mysplash.main.view.fragment.HomeFragment}.
+ *
  * */
 
 @SuppressLint("ViewConstructor")
 public class HomePhotosView extends NestedScrollFrameLayout
         implements PhotosView, PagerView, LoadView, ScrollView,
-        View.OnClickListener, BothWaySwipeRefreshLayout.OnRefreshAndLoadListener,
+        BothWaySwipeRefreshLayout.OnRefreshAndLoadListener,
         SelectCollectionDialog.OnCollectionsChangedListener {
-    // model.
+
+    @BindView(R.id.container_loading_view_large_progressView)
+    CircularProgressView progressView;
+
+    @BindView(R.id.container_loading_view_large_feedbackContainer)
+    RelativeLayout feedbackContainer;
+
+    @BindView(R.id.container_loading_view_large_feedbackTxt)
+    TextView feedbackText;
+
+    @BindView(R.id.container_photo_list_swipeRefreshLayout)
+    BothWaySwipeRefreshLayout refreshLayout;
+
+    @BindView(R.id.container_photo_list_recyclerView)
+    RecyclerView recyclerView;
+
     private PhotosModel photosModel;
-    private LoadModel loadModel;
-    private ScrollModel scrollModel;
-
-    // view.
-    private CircularProgressView progressView;
-    private RelativeLayout feedbackContainer;
-    private TextView feedbackText;
-
-    private BothWaySwipeRefreshLayout refreshLayout;
-    private RecyclerView recyclerView;
-
-    // presenter.
     private PhotosPresenter photosPresenter;
+
     private PagerPresenter pagerPresenter;
+
+    private LoadModel loadModel;
     private LoadPresenter loadPresenter;
+
+    private ScrollModel scrollModel;
     private ScrollPresenter scrollPresenter;
 
-    /** <br> life cycle. */
+    private static class SavedState implements Parcelable {
 
-    public HomePhotosView(MainActivity a, int photosType, int id) {
+        String order;
+        int page;
+        List<Integer> pageList;
+        boolean over;
+
+        SavedState(HomePhotosView view) {
+            this.order = view.photosModel.getPhotosOrder();
+            this.page = view.photosModel.getPhotosPage();
+            this.pageList = new ArrayList<>();
+            this.pageList.addAll(view.photosModel.getPageList());
+            this.over = view.photosModel.isOver();
+        }
+
+        private SavedState(Parcel in) {
+            this.order = in.readString();
+            this.page = in.readInt();
+
+            this.pageList = new ArrayList<>();
+            int[] pages = new int[in.readInt()];
+            in.readIntArray(pages);
+            pageList = new ArrayList<>(pages.length);
+            for (int p : pages) {
+                pageList.add(p);
+            }
+
+            this.over = in.readByte() != 0;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            out.writeString(this.order);
+            out.writeInt(this.page);
+
+            int[] pages = new int[pageList.size()];
+            for (int i = 0; i < pages.length; i ++) {
+                pages[i] = pageList.get(i);
+            }
+            out.writeInt(pages.length);
+            out.writeIntArray(pages);
+
+            out.writeByte(this.over ? (byte) 1 : (byte) 0);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR
+                = new Parcelable.Creator<SavedState>() {
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
+    }
+
+    public HomePhotosView(MainActivity a, @Mysplash.PhotosTypeRule int photosType, int id) {
         super(a);
         this.setId(id);
         this.initialize(a, photosType);
     }
 
+    // init.
+
     @SuppressLint("InflateParams")
-    private void initialize(MainActivity a, int photosType) {
-        View loadingView = LayoutInflater.from(getContext()).inflate(R.layout.container_loading_view_large, this, false);
+    private void initialize(MainActivity a, @Mysplash.PhotosTypeRule int photosType) {
+        View loadingView = LayoutInflater.from(getContext())
+                .inflate(R.layout.container_loading_view_large, this, false);
         addView(loadingView);
 
-        View contentView = LayoutInflater.from(getContext()).inflate(R.layout.container_photo_list, null);
+        View contentView = LayoutInflater.from(getContext())
+                .inflate(R.layout.container_photo_list, null);
         addView(contentView);
 
+        ButterKnife.bind(this, this);
         initModel(a, photosType);
         initPresenter();
         initView();
     }
 
-    @Override
-    public boolean isParentOffset() {
-        return true;
-    }
-
-    /** <br> presenter. */
-
-    private void initPresenter() {
-        this.photosPresenter = new PhotosImplementor(photosModel, this);
-        this.pagerPresenter = new PagerImplementor(this);
-        this.loadPresenter = new LoadImplementor(loadModel, this);
-        this.scrollPresenter = new ScrollImplementor(scrollModel, this);
-    }
-
-    /** <br> view. */
-
-    private void initView() {
-        this.initContentView();
-        this.initLoadingView();
-    }
-
-    private void initContentView() {
-        this.refreshLayout = (BothWaySwipeRefreshLayout) findViewById(R.id.container_photo_list_swipeRefreshLayout);
-        refreshLayout.setOnRefreshAndLoadListener(this);
-        if (Mysplash.getInstance().isLightTheme()) {
-            refreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.colorTextContent_light));
-            refreshLayout.setProgressBackgroundColorSchemeResource(R.color.colorPrimary_light);
-        } else {
-            refreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.colorTextContent_dark));
-            refreshLayout.setProgressBackgroundColorSchemeResource(R.color.colorPrimary_dark);
-        }
-        refreshLayout.setVisibility(GONE);
-
-        int navigationBarHeight = DisplayUtils.getNavigationBarHeight(getResources());
-        refreshLayout.setDragTriggerDistance(
-                BothWaySwipeRefreshLayout.DIRECTION_BOTTOM,
-                (int) (navigationBarHeight + new DisplayUtils(getContext()).dpToPx(16)));
-
-        this.recyclerView = (RecyclerView) findViewById(R.id.container_photo_list_recyclerView);
-        recyclerView.setAdapter(photosPresenter.getAdapter());
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        recyclerView.addOnScrollListener(onScrollListener);
-
-        photosPresenter.getAdapter().setRecyclerView(recyclerView);
-    }
-
-    private void initLoadingView() {
-        this.progressView = (CircularProgressView) findViewById(R.id.container_loading_view_large_progressView);
-        progressView.setVisibility(VISIBLE);
-
-        this.feedbackContainer = (RelativeLayout) findViewById(R.id.container_loading_view_large_feedbackContainer);
-        feedbackContainer.setVisibility(GONE);
-
-        ImageView feedbackImg = (ImageView) findViewById(R.id.container_loading_view_large_feedbackImg);
-        ImageHelper.loadIcon(getContext(), feedbackImg, R.drawable.feedback_no_photos);
-
-        this.feedbackText = (TextView) findViewById(R.id.container_loading_view_large_feedbackTxt);
-
-        Button retryButton = (Button) findViewById(R.id.container_loading_view_large_feedbackBtn);
-        retryButton.setOnClickListener(this);
-    }
-
-    /** <br> model. */
-
-    // init.
-
-    private void initModel(MainActivity a, int photosType) {
+    private void initModel(MainActivity a, @Mysplash.PhotosTypeRule int photosType) {
         this.photosModel = new PhotosObject(
                 a,
                 new PhotoAdapter(a, new ArrayList<Photo>(Mysplash.DEFAULT_PER_PAGE), this, a),
@@ -176,12 +190,80 @@ public class HomePhotosView extends NestedScrollFrameLayout
         this.scrollModel = new ScrollObject(true);
     }
 
-    // interface.
+    private void initPresenter() {
+        this.photosPresenter = new PhotosImplementor(photosModel, this);
+        this.pagerPresenter = new PagerImplementor(this);
+        this.loadPresenter = new LoadImplementor(loadModel, this);
+        this.scrollPresenter = new ScrollImplementor(scrollModel, this);
+    }
 
+    private void initView() {
+        this.initContentView();
+        this.initLoadingView();
+    }
+
+    private void initContentView() {
+        refreshLayout.setColorSchemeColors(ThemeManager.getContentColor(getContext()));
+        refreshLayout.setProgressBackgroundColorSchemeColor(ThemeManager.getRootColor(getContext()));
+        refreshLayout.setOnRefreshAndLoadListener(this);
+        refreshLayout.setVisibility(GONE);
+
+        int navigationBarHeight = DisplayUtils.getNavigationBarHeight(getResources());
+        refreshLayout.setDragTriggerDistance(
+                BothWaySwipeRefreshLayout.DIRECTION_BOTTOM,
+                navigationBarHeight + getResources().getDimensionPixelSize(R.dimen.normal_margin));
+
+        int columnCount = DisplayUtils.getGirdColumnCount(getContext());
+        recyclerView.setAdapter(photosPresenter.getAdapter());
+        if (columnCount > 1) {
+            int margin = getResources().getDimensionPixelSize(R.dimen.little_margin);
+            recyclerView.setPadding(margin, margin, 0, 0);
+        } else {
+            recyclerView.setPadding(0, 0, 0, 0);
+        }
+        recyclerView.setLayoutManager(
+                new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.addOnScrollListener(onScrollListener);
+
+        photosPresenter.getAdapter().setRecyclerView(recyclerView);
+    }
+
+    private void initLoadingView() {
+        progressView.setVisibility(VISIBLE);
+        feedbackContainer.setVisibility(GONE);
+
+        ImageView feedbackImg = ButterKnife.findById(
+                this, R.id.container_loading_view_large_feedbackImg);
+        ImageHelper.loadIcon(getContext(), feedbackImg, R.drawable.feedback_no_photos);
+    }
+
+    // control.
+
+    @Override
+    public boolean isParentOffset() {
+        return true;
+    }
+
+    // photo.
+
+    public void updatePhoto(Photo photo) {
+        photosPresenter.getAdapter().updatePhoto(photo, false, false);
+    }
+
+    /**
+     * Get the photos from the adapter in this view.
+     *
+     * @return Photos in adapter.
+     * */
     public List<Photo> getPhotos() {
         return photosPresenter.getAdapter().getPhotoData();
     }
 
+    /**
+     * Set photos to the adapter in this view.
+     *
+     * @param list Photos that will be set to the adapter.
+     * */
     public void setPhotos(List<Photo> list) {
         if (list == null) {
             list = new ArrayList<>();
@@ -194,20 +276,15 @@ public class HomePhotosView extends NestedScrollFrameLayout
         }
     }
 
-    /** <br> interface. */
+    // interface.
 
-    // on click swipeListener.
+    // on click listener.
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.container_loading_view_large_feedbackBtn:
-                photosPresenter.initRefresh(getContext());
-                break;
-        }
+    @OnClick(R.id.container_loading_view_large_feedbackBtn) void retryRefresh() {
+        photosPresenter.initRefresh(getContext());
     }
 
-    // on refresh an load swipeListener.
+    // on refresh an load listener.
 
     @Override
     public void onRefresh() {
@@ -219,7 +296,7 @@ public class HomePhotosView extends NestedScrollFrameLayout
         photosPresenter.loadMore(getContext(), false);
     }
 
-    // on scroll swipeListener.
+    // on scroll listener.
 
     private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
@@ -229,7 +306,7 @@ public class HomePhotosView extends NestedScrollFrameLayout
         }
     };
 
-    // on collection changed swipeListener.
+    // on collection changed listener.
 
     @Override
     public void onAddCollection(Collection c) {
@@ -238,7 +315,7 @@ public class HomePhotosView extends NestedScrollFrameLayout
 
     @Override
     public void onUpdateCollection(Collection c, User u, Photo p) {
-        photosPresenter.getAdapter().updatePhoto(p, false);
+        photosPresenter.getAdapter().updatePhoto(p, false, true);
     }
 
     // view.
@@ -403,10 +480,13 @@ public class HomePhotosView extends NestedScrollFrameLayout
 
     @Override
     public void autoLoad(int dy) {
-        int lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
+        int[] lastVisibleItems = ((StaggeredGridLayoutManager) recyclerView.getLayoutManager())
+                .findLastVisibleItemPositions(null);
         int totalItemCount = photosPresenter.getAdapter().getRealItemCount();
         if (photosPresenter.canLoadMore()
-                && lastVisibleItem >= totalItemCount - 10 && totalItemCount > 0 && dy > 0) {
+                && lastVisibleItems[lastVisibleItems.length - 1] >= totalItemCount - 10
+                && totalItemCount > 0
+                && dy > 0) {
             photosPresenter.loadMore(getContext(), false);
         }
         if (!ViewCompat.canScrollVertically(recyclerView, -1)) {
@@ -423,75 +503,5 @@ public class HomePhotosView extends NestedScrollFrameLayout
     public boolean needBackToTop() {
         return !scrollPresenter.isToTop()
                 && loadPresenter.getLoadState() == LoadObject.NORMAL_STATE;
-    }
-
-    /** <br> inner class. */
-
-    private static class SavedState implements Parcelable {
-        // data
-        String order;
-
-        int page;
-        List<Integer> pageList;
-
-        boolean over;
-
-        // life cycle.
-
-        SavedState(HomePhotosView view) {
-            this.order = view.photosModel.getPhotosOrder();
-            this.page = view.photosModel.getPhotosPage();
-            this.pageList = new ArrayList<>();
-            this.pageList.addAll(view.photosModel.getPageList());
-            this.over = view.photosModel.isOver();
-        }
-
-        private SavedState(Parcel in) {
-            this.order = in.readString();
-            this.page = in.readInt();
-
-            this.pageList = new ArrayList<>();
-            int[] pages = new int[in.readInt()];
-            in.readIntArray(pages);
-            pageList = new ArrayList<>(pages.length);
-            for (int p : pages) {
-                pageList.add(p);
-            }
-
-            this.over = in.readByte() != 0;
-        }
-
-        // interface.
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            out.writeString(this.order);
-            out.writeInt(this.page);
-
-            int[] pages = new int[pageList.size()];
-            for (int i = 0; i < pages.length; i ++) {
-                pages[i] = pageList.get(i);
-            }
-            out.writeInt(pages.length);
-            out.writeIntArray(pages);
-
-            out.writeByte(this.over ? (byte) 1 : (byte) 0);
-        }
-
-        public static final Parcelable.Creator<SavedState> CREATOR
-                = new Parcelable.Creator<SavedState>() {
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
 }

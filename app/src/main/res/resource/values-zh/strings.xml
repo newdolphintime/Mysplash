@@ -9,6 +9,7 @@
     <string name="translators">译者</string>
     <string name="libraries">开源库</string>
     <string name="enter">确认</string>
+    <string name="exit">退出</string>
     <string name="copy">复制</string>
     <string name="next">下一步</string>
     <string name="cancel">取消</string>
@@ -39,7 +40,17 @@
     <string name="photos">张照片</string>
     <string name="users">位用户</string>
     <string name="to">至</string>
+    <string name="your">你的</string>
+    <string name="you">你</string>
+    <string name="photo">照片</string>
     <string name="more">MORE</string>
+
+    <string name="year_ago">年前</string>
+    <string name="month_ago">个月前</string>
+    <string name="day_ago">天前</string>
+    <string name="hour_ago">小时前</string>
+    <string name="minute_ago">分钟前</string>
+    <string name="second_ago">秒前</string>
 
     <string name="relative_photo">张相关照片</string>
     <string name="relative_collection">张相关收藏集</string>
@@ -53,6 +64,7 @@
     <string name="feedback_load_failed_toast">加载失败</string>
     <string name="feedback_load_nothing_tv">什么也没加载出来</string>
     <string name="feedback_load_nothing_toast">什么也没加载出来</string>
+
     <string name="feedback_search_failed_tv">搜索失败</string>
     <string name="feedback_search_failed_toast">搜索失败</string>
     <string name="feedback_search_nothing_tv">什么也没搜索到</string>
@@ -79,6 +91,7 @@
     <string name="feedback_choose_share_app">分享照片</string>
     <string name="feedback_choose_wallpaper_app">设为壁纸</string>
     <string name="feedback_download_repeat">下载任务重复</string>
+    <string name="feedback_file_does_not_exist">文件不存在</string>
 
     <string name="feedback_size">尺寸</string>
     <string name="feedback_color">颜色</string>
@@ -152,9 +165,19 @@
 
     <string name="feedback_story_is_null">故事不存在或尚未加载</string>
 
+    <string name="feedback_pick_update_interval">刷新频率 (小时)</string>
+    <string name="feedback_interval_bounds">频率的范围是 1 – 24</string>
+    <string name="feedback_update_only_in_wifi">只在WIFI下进行更新</string>
+    <string name="feedback_source_collection">源收藏集</string>
+    <string name="feedback_set_as_source_succeed">设置为壁纸源成功</string>
+    <string name="feedback_set_as_source_failed">源已经存在</string>
+    <string name="feedback_confirm_exit_without_save">你希望直接退出而不保存设置么?</string>
+
     <!-- introduce. -->
     <string name="introduce_title_back_top">回滚至顶部</string>
     <string name="introduce_description_back_top">点击顶栏或返回键，照片列表页面将会自动回滚到顶部</string>
+
+    <string name="muzei_description">精选自 Unsplash</string>
 
     <!-- 菜单项. -->
     <string name="action_home">主页</string>
@@ -175,6 +198,9 @@
 
     <string name="action_search">搜索</string>
     <string name="action_filter">筛选</string>
+    <string name="action_notification">通知</string>
+
+    <string name="action_refresh">刷新</string>
 
     <string name="action_clear_text">清空内容</string>
 
@@ -188,6 +214,7 @@
 
     <string name="action_edit">编辑</string>
     <string name="action_download">下载</string>
+    <string name="action_set_as_source">设置为Muzei壁纸源</string>
 
     <string name="action_path">下载路径</string>
     <string name="action_cancel_all">全部取消</string>
@@ -203,6 +230,8 @@
     <string name="action_lockscreen">设为锁屏</string>
     <string name="action_wallpaper_lockscreen">设为壁纸和锁屏</string>
 
+    <string name="action_muzei_settings">Muzei设置</string>
+
     <!-- 设置项. -->
     <string name="settings_category_basic">基础</string>
     <string name="settings_title_back_to_top">点击返回键回到顶部</string>
@@ -216,5 +245,10 @@
 
     <string name="settings_category_download">下载</string>
     <string name="settings_title_download_scale">下载规格</string>
+
+    <string name="settings_category_display">显示</string>
+    <string name="settings_title_saturation_animation_duration">饱和度动画时长</string>
+    <string name="settings_title_grid_list_in_port">竖屏时以网格显示图片</string>
+    <string name="settings_title_grid_list_in_land">横屏时以网格显示图片</string>
 
 </resources>

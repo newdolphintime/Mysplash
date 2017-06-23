@@ -1,6 +1,6 @@
 package com.wangdaye.mysplash.me.model.activity;
 
-import com.wangdaye.mysplash._common.i.model.PagerManageModel;
+import com.wangdaye.mysplash.common.i.model.PagerManageModel;
 
 /**
  * Pager manage object.
@@ -8,16 +8,12 @@ import com.wangdaye.mysplash._common.i.model.PagerManageModel;
 
 public class PagerManageObject
         implements PagerManageModel {
-    // data
-    private int pagePosition;
 
-    /** <br> life cycle. */
+    private int pagePosition;
 
     public PagerManageObject(int initPosition) {
         this.pagePosition = initPosition;
     }
-
-    /** <br> model. */
 
     @Override
     public int getPagerPosition() {

@@ -1,10 +1,10 @@
 package com.wangdaye.mysplash.tag.model.widget;
 
 import com.wangdaye.mysplash.Mysplash;
-import com.wangdaye.mysplash._common.data.service.SearchService;
-import com.wangdaye.mysplash._common.i.model.SearchModel;
-import com.wangdaye.mysplash._common._basic.MysplashActivity;
-import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
+import com.wangdaye.mysplash.common.data.service.SearchService;
+import com.wangdaye.mysplash.common.i.model.SearchModel;
+import com.wangdaye.mysplash.common._basic.MysplashActivity;
+import com.wangdaye.mysplash.common.ui.adapter.PhotoAdapter;
 
 /**
  * Search object.
@@ -12,7 +12,7 @@ import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
 
 public class SearchObject
         implements SearchModel {
-    // data
+
     private PhotoAdapter adapter;
     private SearchService service;
 
@@ -23,8 +23,6 @@ public class SearchObject
     private boolean refreshing;
     private boolean loading;
     private boolean over;
-
-    /** <br> life cycle. */
 
     public SearchObject(PhotoAdapter adapter, String query) {
         this.adapter = adapter;

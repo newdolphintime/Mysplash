@@ -5,11 +5,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.i.model.FragmentManageModel;
-import com.wangdaye.mysplash._common.i.presenter.FragmentManagePresenter;
-import com.wangdaye.mysplash._common._basic.MysplashActivity;
-import com.wangdaye.mysplash._common._basic.MysplashFragment;
-import com.wangdaye.mysplash._common.utils.DisplayUtils;
+import com.wangdaye.mysplash.common.i.model.FragmentManageModel;
+import com.wangdaye.mysplash.common.i.presenter.FragmentManagePresenter;
+import com.wangdaye.mysplash.common._basic.MysplashActivity;
+import com.wangdaye.mysplash.common._basic.MysplashFragment;
+import com.wangdaye.mysplash.common.utils.DisplayUtils;
 import com.wangdaye.mysplash.main.view.fragment.CategoryFragment;
 import com.wangdaye.mysplash.main.view.fragment.FollowingFragment;
 import com.wangdaye.mysplash.main.view.fragment.HomeFragment;
@@ -21,20 +21,20 @@ import java.util.List;
 
 /**
  * Fragment manage implementor.
+ *
+ * A {@link FragmentManagePresenter} for
+ * {@link com.wangdaye.mysplash.main.view.activity.MainActivity}.
+ *
  * */
 
 public class FragmentManageImplementor
         implements FragmentManagePresenter {
-    // model & view.
-    private FragmentManageModel model;
 
-    /** <br> life cycle. */
+    private FragmentManageModel model;
 
     public FragmentManageImplementor(FragmentManageModel model) {
         this.model = model;
     }
-
-    /** <br> presenter. */
 
     @Override
     public List<MysplashFragment> getFragmentList(MysplashActivity a, boolean includeHidden) {
@@ -64,35 +64,35 @@ public class FragmentManageImplementor
     }
 
     @Override
-    public void changeFragment(MysplashActivity a, int code, boolean init) {
+    public void changeFragment(MysplashActivity a, int code) {
         int oldCode = model.getId();
         model.setId(code);
 
-        if (init) {
-            MysplashFragment f = buildFragmentByCode(code);
-            replaceFragment(a, f);
-        } else {
-            MysplashFragment newF = null;
-            MysplashFragment oldF = null;
+        MysplashFragment newF = null;
+        MysplashFragment oldF = null;
 
-            List<MysplashFragment> list = getFragmentList(a, true);
-            for (int i = 0; i < list.size(); i ++) {
-                if (getFragmentCode(list.get(i)) == oldCode) {
-                    oldF = list.get(i);
-                }
-                if (getFragmentCode(list.get(i)) == code) {
-                    newF = list.get(i);
-                }
-                if (newF != null && oldF != null) {
-                    break;
-                }
+        List<MysplashFragment> list = getFragmentList(a, true);
+        for (int i = 0; i < list.size(); i ++) {
+            if (getFragmentCode(list.get(i)) == oldCode) {
+                oldF = list.get(i);
             }
+            if (getFragmentCode(list.get(i)) == code) {
+                newF = list.get(i);
+            }
+            if (newF != null && oldF != null) {
+                break;
+            }
+        }
+        if (oldF == null) {
             if (newF == null) {
                 newF = buildFragmentByCode(code);
-                showAndHideNewFragment(a, newF, oldF);
-            } else {
-                showAndHideFragment(a, newF, oldF);
             }
+            replaceFragment(a, newF);
+        } else if (newF == null) {
+            newF = buildFragmentByCode(code);
+            showAndHideNewFragment(a, newF, oldF);
+        } else {
+            showAndHideFragment(a, newF, oldF);
         }
     }
 
@@ -125,8 +125,6 @@ public class FragmentManageImplementor
         }
     }
 */
-
-    /** <br> utils. */
 
     private void replaceFragment(MysplashActivity a, MysplashFragment f) {
         a.getSupportFragmentManager()

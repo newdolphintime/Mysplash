@@ -1,6 +1,7 @@
 package com.wangdaye.mysplash.main.model.fragment;
 
-import com.wangdaye.mysplash._common.i.model.CategoryManageModel;
+import com.wangdaye.mysplash.Mysplash;
+import com.wangdaye.mysplash.common.i.model.CategoryManageModel;
 
 /**
  * Category manage object.
@@ -8,16 +9,13 @@ import com.wangdaye.mysplash._common.i.model.CategoryManageModel;
 
 public class CategoryManageObject
         implements CategoryManageModel {
-    // data
-    private int categoryId;
 
-    /** <br> life cycle. */
+    @Mysplash.CategoryIdRule
+    private int categoryId;
 
     public CategoryManageObject(int categoryId) {
         this.categoryId = categoryId;
     }
-
-    /** <br> model. */
 
     @Override
     public int getCategoryId() {

@@ -5,16 +5,16 @@ import android.support.design.widget.Snackbar;
 
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.data.api.PhotoApi;
-import com.wangdaye.mysplash._common.data.entity.unsplash.Photo;
-import com.wangdaye.mysplash._common.data.service.PhotoService;
-import com.wangdaye.mysplash._common.i.model.CategoryModel;
-import com.wangdaye.mysplash._common.i.presenter.CategoryPresenter;
-import com.wangdaye.mysplash._common._basic.MysplashActivity;
-import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
-import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
-import com.wangdaye.mysplash._common.utils.ValueUtils;
-import com.wangdaye.mysplash._common.i.view.CategoryView;
+import com.wangdaye.mysplash.common.data.api.PhotoApi;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Photo;
+import com.wangdaye.mysplash.common.data.service.PhotoService;
+import com.wangdaye.mysplash.common.i.model.CategoryModel;
+import com.wangdaye.mysplash.common.i.presenter.CategoryPresenter;
+import com.wangdaye.mysplash.common._basic.MysplashActivity;
+import com.wangdaye.mysplash.common.ui.adapter.PhotoAdapter;
+import com.wangdaye.mysplash.common.utils.helper.NotificationHelper;
+import com.wangdaye.mysplash.common.utils.ValueUtils;
+import com.wangdaye.mysplash.common.i.view.CategoryView;
 
 import java.util.List;
 
@@ -23,25 +23,23 @@ import retrofit2.Response;
 
 /**
  * Category implementor.
+ *
+ * A {@link CategoryPresenter} for {@link com.wangdaye.mysplash.main.view.widget.CategoryPhotosView}.
+ *
  * */
 
 public class CategoryImplementor
         implements CategoryPresenter {
-    // model & view.
+
     private CategoryModel model;
     private CategoryView view;
 
-    // data
     private OnRequestPhotosListener listener;
-
-    /** <br> life cycle. */
 
     public CategoryImplementor(CategoryModel model, CategoryView view) {
         this.model = model;
         this.view = view;
     }
-
-    /** <br> presenter. */
 
     @Override
     public void requestPhotos(Context c, int page, boolean refresh) {
@@ -157,10 +155,8 @@ public class CategoryImplementor
         return model.getAdapter();
     }
 
-    /** <br> utils. */
-
     private void requestPhotosInCategoryOrders(Context c, int page, boolean refresh) {
-        page = refresh ? 1: page + 1;
+        page = Math.max(1, refresh ? 1 : page + 1);
         listener = new OnRequestPhotosListener(c, page, refresh, false);
         model.getService()
                 .requestPhotosInAGivenCategory(
@@ -184,10 +180,10 @@ public class CategoryImplementor
                         listener);
     }
 
-    /** <br> interface. */
+    // interface.
 
     private class OnRequestPhotosListener implements PhotoService.OnRequestPhotosListener {
-        // data
+
         private Context c;
         private int page;
         private boolean refresh;

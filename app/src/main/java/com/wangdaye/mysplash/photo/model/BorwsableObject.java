@@ -4,9 +4,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.wangdaye.mysplash._common.data.service.PhotoInfoService;
-import com.wangdaye.mysplash._common.i.model.BrowsableModel;
+import com.wangdaye.mysplash.common.data.service.PhotoInfoService;
+import com.wangdaye.mysplash.common.i.model.BrowsableModel;
 import com.wangdaye.mysplash.photo.view.activity.PhotoActivity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Browsable object.
@@ -14,11 +17,9 @@ import com.wangdaye.mysplash.photo.view.activity.PhotoActivity;
 
 public class BorwsableObject
         implements BrowsableModel {
-    // data
+
     private Uri intentUri;
     private PhotoInfoService service;
-
-    /** <br> life cycle. */
 
     public BorwsableObject(Intent intent) {
         if (intent.getDataString() == null) {
@@ -34,8 +35,6 @@ public class BorwsableObject
         service = PhotoInfoService.getService();
     }
 
-    /** <br> model. */
-
     @Override
     public Uri getIntentUri() {
         return intentUri;
@@ -47,8 +46,10 @@ public class BorwsableObject
     }
 
     @Override
-    public String getBrowsableDataKey() {
-        return intentUri.getLastPathSegment();
+    public List<String> getBrowsableDataKey() {
+        List<String> resultList = new ArrayList<>();
+        resultList.add(intentUri.getLastPathSegment());
+        return resultList;
     }
 
     @Override

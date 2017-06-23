@@ -9,10 +9,11 @@
     android:layout_marginRight="@dimen/little_margin"
     android:layout_marginBottom="@dimen/little_margin"
     android:foreground="?attr/selectableItemBackground"
-    android:stateListAnimator="@animator/touch_rise"
+    android:stateListAnimator="@animator/touch_rise_item"
     app:cardBackgroundColor="@color/colorPrimary_dark"
     app:cardCornerRadius="2dp"
     app:cardPreventCornerOverlap="true"
+    app:cardElevation="@dimen/low_elevation"
     tools:ignore="UnusedAttribute">
 
     <ImageView
@@ -27,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.wangdaye.mysplash._common.ui.widget.CircularProgressIcon
+        <com.wangdaye.mysplash.common.ui.widget.CircularProgressIcon
             android:id="@+id/item_collection_icon"
             android:layout_width="34dp"
             android:layout_height="34dp"

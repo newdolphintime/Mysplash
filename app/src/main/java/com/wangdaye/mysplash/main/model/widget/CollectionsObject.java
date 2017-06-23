@@ -1,17 +1,24 @@
 package com.wangdaye.mysplash.main.model.widget;
 
+import android.content.Context;
+
 import com.wangdaye.mysplash.Mysplash;
-import com.wangdaye.mysplash._common.data.service.CollectionService;
-import com.wangdaye.mysplash._common.i.model.CollectionsModel;
-import com.wangdaye.mysplash._common.ui.adapter.CollectionAdapter;
+import com.wangdaye.mysplash.common.data.service.CollectionService;
+import com.wangdaye.mysplash.common.i.model.CollectionsModel;
+import com.wangdaye.mysplash.common.ui.adapter.CollectionAdapter;
+import com.wangdaye.mysplash.common.utils.manager.SettingsOptionManager;
 
 /**
  * Collections object.
+ *
+ * A {@link CollectionsModel} for
+ * {@link com.wangdaye.mysplash.main.view.widget.HomeCollectionsView}.
+ *
  * */
 
 public class CollectionsObject
         implements CollectionsModel {
-    // data
+
     private CollectionAdapter adapter;
     private CollectionService service;
 
@@ -23,13 +30,11 @@ public class CollectionsObject
     private boolean loading;
     private boolean over;
 
-    /** <br> life cycle. */
-
-    public CollectionsObject(CollectionAdapter adapter) {
+    public CollectionsObject(Context context, CollectionAdapter adapter) {
         this.adapter = adapter;
         this.service = CollectionService.getService();
 
-        this.collectionsType = Mysplash.getInstance().getDefaultCollectionType();
+        this.collectionsType = SettingsOptionManager.getInstance(context).getDefaultCollectionType();
 
         this.collectionsPage = adapter.getItemCount() / Mysplash.DEFAULT_PER_PAGE;
 
@@ -37,8 +42,6 @@ public class CollectionsObject
         this.loading = false;
         this.over = false;
     }
-
-    /** <br> model. */
 
     @Override
     public CollectionAdapter getAdapter() {

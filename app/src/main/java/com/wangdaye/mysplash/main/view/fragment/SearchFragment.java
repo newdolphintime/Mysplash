@@ -1,6 +1,7 @@
 package com.wangdaye.mysplash.main.view.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.design.widget.CoordinatorLayout;
@@ -18,29 +19,37 @@ import android.widget.TextView;
 
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.i.model.PagerManageModel;
-import com.wangdaye.mysplash._common.i.presenter.MessageManagePresenter;
-import com.wangdaye.mysplash._common.i.presenter.PagerManagePresenter;
-import com.wangdaye.mysplash._common.i.presenter.SearchBarPresenter;
-import com.wangdaye.mysplash._common.i.view.PagerManageView;
-import com.wangdaye.mysplash._common.i.view.PagerView;
-import com.wangdaye.mysplash._common._basic.MysplashActivity;
-import com.wangdaye.mysplash._common.ui.adapter.MyPagerAdapter;
-import com.wangdaye.mysplash._common._basic.MysplashFragment;
-import com.wangdaye.mysplash._common.ui.widget.AutoHideInkPageIndicator;
-import com.wangdaye.mysplash._common.ui.widget.nestedScrollView.NestedScrollAppBarLayout;
-import com.wangdaye.mysplash._common.utils.BackToTopUtils;
-import com.wangdaye.mysplash._common.utils.DisplayUtils;
-import com.wangdaye.mysplash._common.i.view.MessageManageView;
-import com.wangdaye.mysplash._common.i.view.SearchBarView;
+import com.wangdaye.mysplash.collection.view.activity.CollectionActivity;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Collection;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Photo;
+import com.wangdaye.mysplash.common.data.entity.unsplash.User;
+import com.wangdaye.mysplash.common.i.model.PagerManageModel;
+import com.wangdaye.mysplash.common.i.presenter.MessageManagePresenter;
+import com.wangdaye.mysplash.common.i.presenter.PagerManagePresenter;
+import com.wangdaye.mysplash.common.i.presenter.SearchBarPresenter;
+import com.wangdaye.mysplash.common.i.view.PagerManageView;
+import com.wangdaye.mysplash.common.i.view.PagerView;
+import com.wangdaye.mysplash.common._basic.MysplashActivity;
+import com.wangdaye.mysplash.common.ui.adapter.MyPagerAdapter;
+import com.wangdaye.mysplash.common._basic.MysplashFragment;
+import com.wangdaye.mysplash.common.ui.widget.AutoHideInkPageIndicator;
+import com.wangdaye.mysplash.common.ui.widget.nestedScrollView.NestedScrollAppBarLayout;
+import com.wangdaye.mysplash.common.utils.BackToTopUtils;
+import com.wangdaye.mysplash.common.utils.DisplayUtils;
+import com.wangdaye.mysplash.common.i.view.MessageManageView;
+import com.wangdaye.mysplash.common.i.view.SearchBarView;
+import com.wangdaye.mysplash.common.utils.manager.AuthManager;
+import com.wangdaye.mysplash.common.utils.manager.ThemeManager;
 import com.wangdaye.mysplash.main.model.fragment.PagerManageObject;
 import com.wangdaye.mysplash.main.presenter.fragment.MessageManageImplementor;
 import com.wangdaye.mysplash.main.presenter.fragment.PagerManageImplementor;
 import com.wangdaye.mysplash.main.presenter.fragment.SearchBarImplementor;
-import com.wangdaye.mysplash._common.ui.widget.coordinatorView.StatusBarView;
+import com.wangdaye.mysplash.common.ui.widget.coordinatorView.StatusBarView;
 import com.wangdaye.mysplash.main.view.activity.MainActivity;
 import com.wangdaye.mysplash.main.view.widget.HomeSearchView;
-import com.wangdaye.mysplash._common.utils.widget.SafeHandler;
+import com.wangdaye.mysplash.common.utils.widget.SafeHandler;
+import com.wangdaye.mysplash.photo.view.activity.PhotoActivity;
+import com.wangdaye.mysplash.user.view.activity.UserActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,8 +57,14 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Search Fragment.
+ *
+ * This fragment is used to search photos, collections and users by a parameter.
+ *
  * */
 
 public class SearchFragment extends MysplashFragment
@@ -57,35 +72,43 @@ public class SearchFragment extends MysplashFragment
         View.OnClickListener, Toolbar.OnMenuItemClickListener, EditText.OnEditorActionListener,
         ViewPager.OnPageChangeListener, NestedScrollAppBarLayout.OnNestedScrollingListener,
         SafeHandler.HandlerContainer {
-    // model.
-    private PagerManageModel pagerManageModel;
 
-    // view.
-    private StatusBarView statusBar;
+    @BindView(R.id.fragment_search_statusBar)
+    StatusBarView statusBar;
 
-    private CoordinatorLayout container;
-    private NestedScrollAppBarLayout appBar;
-    private EditText editText;
-    private ViewPager viewPager;
-    private AutoHideInkPageIndicator indicator;
+    @BindView(R.id.fragment_search_container)
+    CoordinatorLayout container;
+
+    @BindView(R.id.fragment_search_appBar)
+    NestedScrollAppBarLayout appBar;
+
+    @BindView(R.id.fragment_search_editText)
+    EditText editText;
+
+    @BindView(R.id.fragment_search_viewPager)
+    ViewPager viewPager;
+
+    @BindView(R.id.fragment_search_indicator)
+    AutoHideInkPageIndicator indicator;
+
     private PagerView[] pagers = new PagerView[3];
 
     private SafeHandler<SearchFragment> handler;
 
-    // presenter.
     private SearchBarPresenter searchBarPresenter;
+
     private MessageManagePresenter messageManagePresenter;
+
+    private PagerManageModel pagerManageModel;
     private PagerManagePresenter pagerManagePresenter;
 
-    // data.
     private final String KEY_SEARCH_FRAGMENT_QUERY = "search_fragment_query";
     private final String KEY_SEARCH_FRAGMENT_PAGE_POSITION = "search_fragment_page_position";
-
-    /** <br> life cycle. */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
+        ButterKnife.bind(this, view);
         initModel(savedInstanceState);
         initPresenter();
         initView(view, savedInstanceState);
@@ -106,33 +129,27 @@ public class SearchFragment extends MysplashFragment
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(KEY_SEARCH_FRAGMENT_QUERY, editText.getText().toString());
-        outState.putInt(KEY_SEARCH_FRAGMENT_PAGE_POSITION, pagerManagePresenter.getPagerPosition());
-    }
-
-    @Override
-    public View getSnackbarContainer() {
-        return container;
-    }
-
-    @Override
     public boolean needSetOnlyWhiteStatusBarText() {
         return appBar.getY() <= -appBar.getMeasuredHeight();
     }
 
     @Override
-    public boolean needPagerBackToTop() {
-        return pagerManagePresenter.needPagerBackToTop();
+    public void onHiddenChanged(boolean hidden) {
+        if (hidden) {
+            hideKeyboard();
+        } else {
+            showKeyboard();
+        }
     }
 
     @Override
-    public void backToTop() {
-        statusBar.animToInitAlpha();
-        setStatusBarStyle(false);
-        BackToTopUtils.showTopBar(appBar, viewPager);
-        pagerManagePresenter.pagerScrollToTop();
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_SEARCH_FRAGMENT_QUERY, editText.getText().toString());
+        outState.putInt(KEY_SEARCH_FRAGMENT_PAGE_POSITION, pagerManagePresenter.getPagerPosition());
+        for (PagerView p : pagers) {
+            p.onSaveInstanceState(outState);
+        }
     }
 
     @Override
@@ -161,39 +178,83 @@ public class SearchFragment extends MysplashFragment
         }
     }
 
-    /** <br> presenter. */
-
-    private void initPresenter() {
-        this.searchBarPresenter = new SearchBarImplementor(this);
-        this.messageManagePresenter = new MessageManageImplementor(this);
-        this.pagerManagePresenter = new PagerManageImplementor(pagerManageModel, this);
+    @Override
+    public boolean needBackToTop() {
+        return pagerManagePresenter.needPagerBackToTop();
     }
 
-    /** <br> view. */
+    @Override
+    public void backToTop() {
+        statusBar.animToInitAlpha();
+        setStatusBarStyle(false);
+        BackToTopUtils.showTopBar(appBar, viewPager);
+        pagerManagePresenter.pagerScrollToTop();
+    }
+
+    @Override
+    public void handleActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case Mysplash.PHOTO_ACTIVITY:
+                Photo photo = data.getParcelableExtra(PhotoActivity.KEY_PHOTO_ACTIVITY_PHOTO);
+                if (photo != null) {
+                    ((HomeSearchView) pagers[0]).updatePhoto(photo);
+                }
+                break;
+
+            case Mysplash.COLLECTION_ACTIVITY:
+                Collection collection = data.getParcelableExtra(
+                        CollectionActivity.KEY_COLLECTION_ACTIVITY_COLLECTION);
+                if (collection != null) {
+                    ((HomeSearchView) pagers[1]).updateCollection(collection);
+                }
+                break;
+
+            case Mysplash.USER_ACTIVITY:
+                User user = data.getParcelableExtra(
+                        UserActivity.KEY_USER_ACTIVITY_USER);
+                if (user != null) {
+                    ((HomeSearchView) pagers[2]).updateUser(user);
+                }
+                break;
+
+            case Mysplash.ME_ACTIVITY:
+                User me = AuthManager.getInstance().getUser();
+                if (me != null) {
+                    ((HomeSearchView) pagers[2]).updateUser(me);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public CoordinatorLayout getSnackbarContainer() {
+        return container;
+    }
+
+    // init.
+
+    private void initModel(Bundle saveInstanceState) {
+        if (saveInstanceState != null) {
+            this.pagerManageModel = new PagerManageObject(
+                    saveInstanceState.getInt(KEY_SEARCH_FRAGMENT_PAGE_POSITION, 0));
+        } else {
+            this.pagerManageModel = new PagerManageObject(0);
+        }
+    }
 
     private void initView(View v, Bundle savedInstanceState) {
         this.handler = new SafeHandler<>(this);
 
-        this.statusBar = (StatusBarView) v.findViewById(R.id.fragment_search_statusBar);
-        statusBar.setInitMaskAlpha();
-
-        this.container = (CoordinatorLayout) v.findViewById(R.id.fragment_search_container);
-
-        this.appBar = (NestedScrollAppBarLayout) v.findViewById(R.id.fragment_search_appBar);
         appBar.setOnNestedScrollingListener(this);
 
-        Toolbar toolbar = (Toolbar) v.findViewById(R.id.fragment_search_toolbar);
-        if (Mysplash.getInstance().isLightTheme()) {
-            toolbar.inflateMenu(R.menu.fragment_search_toolbar_light);
-            toolbar.setNavigationIcon(R.drawable.ic_toolbar_back_light);
-        } else {
-            toolbar.inflateMenu(R.menu.fragment_search_toolbar_dark);
-            toolbar.setNavigationIcon(R.drawable.ic_toolbar_back_dark);
-        }
+        Toolbar toolbar = ButterKnife.findById(v, R.id.fragment_search_toolbar);
+        ThemeManager.setNavigationIcon(
+                toolbar, R.drawable.ic_toolbar_back_light, R.drawable.ic_toolbar_back_dark);
+        ThemeManager.inflateMenu(
+                toolbar, R.menu.fragment_search_toolbar_light, R.menu.fragment_search_toolbar_dark);
         toolbar.setOnMenuItemClickListener(this);
         toolbar.setNavigationOnClickListener(this);
 
-        this.editText = (EditText) v.findViewById(R.id.fragment_search_editText);
         DisplayUtils.setTypeface(getActivity(), editText);
         editText.setOnEditorActionListener(this);
         editText.setFocusable(true);
@@ -211,17 +272,20 @@ public class SearchFragment extends MysplashFragment
                 new HomeSearchView(
                         (MainActivity) getActivity(),
                         HomeSearchView.SEARCH_PHOTOS_TYPE,
-                        R.id.fragment_search_page_photo));
+                        R.id.fragment_search_page_photo)
+                        .setClickListenerForFeedbackView(hideKeyboardListener));
         pageList.add(
                 new HomeSearchView(
                         (MainActivity) getActivity(),
                         HomeSearchView.SEARCH_COLLECTIONS_TYPE,
-                        R.id.fragment_search_page_collection));
+                        R.id.fragment_search_page_collection)
+                        .setClickListenerForFeedbackView(hideKeyboardListener));
         pageList.add(
                 new HomeSearchView(
                         (MainActivity) getActivity(),
                         HomeSearchView.SEARCH_USERS_TYPE,
-                        R.id.fragment_search_page_user));
+                        R.id.fragment_search_page_user)
+                        .setClickListenerForFeedbackView(hideKeyboardListener));
         for (int i = 0; i < pageList.size(); i ++) {
             pagers[i] = (PagerView) pageList.get(i);
             pageList.get(i).setOnClickListener(new View.OnClickListener() {
@@ -238,16 +302,14 @@ public class SearchFragment extends MysplashFragment
         Collections.addAll(tabList, searchTabs);
         MyPagerAdapter adapter = new MyPagerAdapter(pageList, tabList);
 
-        this.viewPager = (ViewPager) v.findViewById(R.id.fragment_search_viewPager);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(this);
         viewPager.setCurrentItem(pagerManagePresenter.getPagerPosition(), false);
 
-        TabLayout tabLayout = (TabLayout) v.findViewById(R.id.fragment_search_tabLayout);
+        TabLayout tabLayout = ButterKnife.findById(v, R.id.fragment_search_tabLayout);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.setupWithViewPager(viewPager);
 
-        this.indicator = (AutoHideInkPageIndicator) v.findViewById(R.id.fragment_search_indicator);
         indicator.setViewPager(viewPager);
         indicator.setAlpha(0f);
 
@@ -258,20 +320,15 @@ public class SearchFragment extends MysplashFragment
         }
     }
 
-    /** <br> model. */
-
-    private void initModel(Bundle saveInstanceState) {
-        if (saveInstanceState != null) {
-            this.pagerManageModel = new PagerManageObject(
-                    saveInstanceState.getInt(KEY_SEARCH_FRAGMENT_PAGE_POSITION, 0));
-        } else {
-            this.pagerManageModel = new PagerManageObject(0);
-        }
+    private void initPresenter() {
+        this.searchBarPresenter = new SearchBarImplementor(this);
+        this.messageManagePresenter = new MessageManageImplementor(this);
+        this.pagerManagePresenter = new PagerManageImplementor(pagerManageModel, this);
     }
 
-    /** <br> interface. */
+    // interface.
 
-    // on click swipeListener.
+    // on click listener.
 
     @Override
     public void onClick(View view) {
@@ -282,14 +339,21 @@ public class SearchFragment extends MysplashFragment
         }
     }
 
-    // on menu item click swipeListener.
+    private View.OnClickListener hideKeyboardListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            searchBarPresenter.hideKeyboard();
+        }
+    };
+
+    // on menu item click listener.
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         return searchBarPresenter.touchMenuItem((MysplashActivity) getActivity(), item.getItemId());
     }
 
-    // on editor action clickListener.
+    // on editor action listener.
 
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -301,7 +365,7 @@ public class SearchFragment extends MysplashFragment
         return true;
     }
 
-    // on page change swipeListener.
+    // on page change listener.
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -329,7 +393,7 @@ public class SearchFragment extends MysplashFragment
         }
     }
 
-    // on nested scrolling swipeListener.
+    // on nested scrolling listener.
 
     @Override
     public void onStartNestedScroll() {
@@ -339,12 +403,12 @@ public class SearchFragment extends MysplashFragment
     @Override
     public void onNestedScrolling() {
         if (needSetOnlyWhiteStatusBarText()) {
-            if (statusBar.isInitAlpha()) {
+            if (statusBar.isInitState()) {
                 statusBar.animToDarkerAlpha();
                 setStatusBarStyle(true);
             }
         } else {
-            if (!statusBar.isInitAlpha()) {
+            if (!statusBar.isInitState()) {
                 statusBar.animToInitAlpha();
                 setStatusBarStyle(false);
             }
@@ -360,7 +424,7 @@ public class SearchFragment extends MysplashFragment
 
     @Override
     public void handleMessage(Message message) {
-        messageManagePresenter.responseMessage((MysplashActivity) getActivity(), message.what, message.obj);
+        messageManagePresenter.responseMessage(message.what, message.obj);
     }
 
     // view.
@@ -374,14 +438,18 @@ public class SearchFragment extends MysplashFragment
 
     @Override
     public void showKeyboard() {
-        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        manager.showSoftInput(editText, 0);
+        if (getActivity() != null) {
+            ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .showSoftInput(editText, 0);
+        }
     }
 
     @Override
     public void hideKeyboard() {
-        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        manager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        if (getActivity() != null) {
+            ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        }
     }
 
     @Override
@@ -411,6 +479,7 @@ public class SearchFragment extends MysplashFragment
         switch (what) {
             case 1:
                 showKeyboard();
+                editText.clearFocus();
                 break;
         }
     }

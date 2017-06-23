@@ -36,12 +36,6 @@
         <item>Popolare</item>
         <item>Casuale</item>
     </string-array>
-    <string-array name="photo_order_values">
-        <item>ultimo</item>
-        <item>datato</item>
-        <item>popolare</item>
-        <item>casuale</item>
-    </string-array>
 
     <!-- collection type. -->
     <string-array name="collection_types">
@@ -52,12 +46,13 @@
 
     <!-- download type. -->
     <string-array name="download_types">
+        <item>Tiny</item>
         <item>Compatto</item>
         <item>Originale</item>
     </string-array>
 
     <!-- back to top. -->
-    <string-array name="back_to_top_type">
+    <string-array name="back_to_top_types">
         <item>Tutta la lista</item>
         <item>Solo pagina principale</item>
         <item>Nessuno</item>

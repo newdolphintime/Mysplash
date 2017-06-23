@@ -1,6 +1,6 @@
 package com.wangdaye.mysplash.user.model.widget;
 
-import com.wangdaye.mysplash._common.i.model.ScrollModel;
+import com.wangdaye.mysplash.common.i.model.ScrollModel;
 
 /**
  * Scroll object.
@@ -8,16 +8,12 @@ import com.wangdaye.mysplash._common.i.model.ScrollModel;
 
 public class ScrollObject
         implements ScrollModel {
-    // data
-    private boolean toTop;
 
-    /** <br> life cycle. */
+    private boolean toTop;
 
     public ScrollObject() {
         this.toTop = true;
     }
-
-    /** <br> model. */
 
     @Override
     public boolean isToTop() {

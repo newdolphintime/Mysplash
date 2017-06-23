@@ -10,12 +10,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:theme="@style/MysplashTheme_light"
+        android:supportsRtl="true"
+        android:largeHeap="true"
+        android:allowTaskReparenting="true"
+        android:taskAffinity=".mysplash"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,ManifestResource"
         tools:targetApi="25">
 
         <activity
             android:name=".main.view.activity.MainActivity"
             android:theme="@style/MysplashTheme_light.Main"
+            android:launchMode="singleTask"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,9 +41,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".main.view.activity.NotificationActivity"
+            android:theme="@style/MysplashTheme_light.Translucent.Common"
+            android:label="@string/app_name" />
+
         <activity
             android:name=".photo.view.activity.PhotoActivity"
             android:theme="@style/MysplashTheme_light.Translucent.Photo"
+            android:launchMode="singleTask"
             android:label="@string/app_name">
             <intent-filter>
                 <data
@@ -52,13 +62,14 @@
         </activity>
 
         <activity
-            android:name="._common.ui.activity.PreviewActivity"
+            android:name=".common.ui.activity.PreviewActivity"
             android:theme="@style/MysplashTheme_light.Translucent.TranslucentNavigation"
             android:label="@string/app_name" />
 
         <activity
             android:name=".collection.view.activity.CollectionActivity"
             android:theme="@style/MysplashTheme_light.Translucent.Common"
+            android:launchMode="singleTask"
             android:label="@string/app_name">
             <intent-filter>
                 <data
@@ -74,6 +85,7 @@
         <activity
             android:name=".user.view.activity.UserActivity"
             android:theme="@style/MysplashTheme_light.Translucent.User"
+            android:launchMode="singleTask"
             android:label="@string/app_name">
             <intent-filter>
                 <data
@@ -86,7 +98,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="._common.ui.activity.LoginActivity"
+        <activity android:name=".common.ui.activity.LoginActivity"
             android:theme="@style/MysplashTheme_light.Translucent.Common"
             android:label="@string/app_name"
             android:launchMode="singleInstance">
@@ -103,6 +115,7 @@
         <activity
             android:name=".me.view.activity.MeActivity"
             android:theme="@style/MysplashTheme_light.Translucent.Me"
+            android:launchMode="singleTask"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="com.wangdaye.mysplash.Me" />
@@ -115,13 +128,14 @@
             android:theme="@style/MysplashTheme_light.Translucent.Common"
             android:label="@string/app_name" />
 
-        <activity android:name="._common.ui.activity.UpdateMeActivity"
+        <activity android:name=".common.ui.activity.UpdateMeActivity"
             android:theme="@style/MysplashTheme_light.Translucent.Common"
             android:label="@string/app_name" />
 
         <activity
-            android:name="._common.ui.activity.DownloadManageActivity"
+            android:name=".common.ui.activity.DownloadManageActivity"
             android:theme="@style/MysplashTheme_light.Translucent.Common"
+            android:launchMode="singleTask"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="com.wangdaye.mysplash.DownloadManager" />
@@ -130,7 +144,7 @@
         </activity>
 
         <activity
-            android:name="._common.ui.activity.SettingsActivity"
+            android:name=".common.ui.activity.SettingsActivity"
             android:theme="@style/MysplashTheme_light.Translucent.Settings"
             android:label="@string/action_settings" />
 
@@ -140,7 +154,7 @@
             android:label="@string/action_about"/>
 
         <activity
-            android:name="._common.ui.activity.IntroduceActivity"
+            android:name=".common.ui.activity.IntroduceActivity"
             android:theme="@style/MysplashTheme_light.Translucent.Common"
             android:label="@string/app_name" />
 
@@ -148,33 +162,74 @@
             android:theme="@style/MysplashTheme_light.Translucent.TranslucentNavigation"
             android:label="@string/app_name" />
 
-        <activity android:name="._common.ui.activity.CustomApiActivity"
+        <activity android:name=".common.ui.activity.CustomApiActivity"
             android:theme="@style/MysplashTheme_light.Translucent.Common"
             android:label="@string/app_name" />
 
-        <activity android:name="._common.ui.activity.RelativeActivity"
-            android:theme="@style/MysplashTheme_light.Translucent.Common"
-            android:label="@string/app_name" />
-
-        <activity android:name="._common.ui.activity.SetWallpaperActivity"
+        <activity android:name=".common.ui.activity.SetWallpaperActivity"
             android:theme="@style/MysplashTheme_dark.SetWallpaper"
+            android:launchMode="singleTask"
             android:label="@string/app_name">
             <intent-filter>
                 <data android:mimeType="image/*" />
                 <action android:name="android.intent.action.ATTACH_DATA" />
                 <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".common.ui.activity.RestartActivity"
+            android:theme="@style/MysplashTheme_light.Translucent.Common" />
+
+        <activity
+            android:name=".common.ui.activity.MuzeiConfigurationActivity"
+            android:theme="@style/MysplashTheme_light.Translucent.Common"
+            android:label="@string/action_muzei_settings"
+            android:launchMode="singleTask"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- receiver. -->
 
         <receiver
-            android:name="._common.receiver.DownloadReceiver">
+            android:name=".common.receiver.DownloadReceiver">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
                 <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED"/>
             </intent-filter>
         </receiver>
+
+        <!-- service. -->
+
+        <service
+            android:name=".common.service.MuzeiSourceService"
+            android:label="@string/app_name"
+            android:description="@string/muzei_description"
+            android:icon="@drawable/ic_notification"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="com.google.android.apps.muzei.api.MuzeiArtSource" />
+            </intent-filter>
+            <meta-data
+                android:name="color"
+                android:value="@color/colorPrimary_dark" />
+            <meta-data
+                android:name="settingsActivity"
+                android:value=".common.ui.activity.MuzeiConfigurationActivity" />
+        </service>
+
+        <!-- provider. -->
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.wangdaye.mysplash"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 
@@ -185,5 +240,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
+    <!-- Muzei. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
 </manifest>

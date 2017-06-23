@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.i.model.FragmentManageModel;
+import com.wangdaye.mysplash.common.i.model.FragmentManageModel;
 
 /**
  * Fragment mange object.
@@ -12,10 +12,8 @@ import com.wangdaye.mysplash._common.i.model.FragmentManageModel;
 
 public class FragmentManageObject
         implements FragmentManageModel {
-    // data
-    private int id;
 
-    /** <br> life cycle. */
+    private int id;
 
     public FragmentManageObject(int id, Intent intent) {
         this.id = id;
@@ -28,15 +26,13 @@ public class FragmentManageObject
         }
     }
 
-    /** <br> model. */
+    @Override
+    public int getId() {
+        return id;
+    }
 
     @Override
     public void setId(int id) {
         this.id = id;
-    }
-
-    @Override
-    public int getId() {
-        return id;
     }
 }

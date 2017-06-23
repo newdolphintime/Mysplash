@@ -10,10 +10,10 @@
     android:layout_marginBottom="@dimen/normal_margin"
     android:background="@color/colorPrimary_dark"
     android:foreground="?attr/selectableItemBackground"
-    android:stateListAnimator="@animator/touch_rise"
+    android:stateListAnimator="@animator/touch_rise_avatar"
     tools:ignore="RtlHardcoded,UnusedAttribute">
 
-    <com.wangdaye.mysplash._common.ui.widget.freedomSizeView.FreedomImageView
+    <com.wangdaye.mysplash.common.ui.widget.freedomSizeView.FreedomImageView
         android:id="@+id/item_following_more_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,12 +41,12 @@
             tools:text="3 MORE"
             tools:ignore="RtlHardcoded" />
 
-        <com.wangdaye.mysplash._common.ui.widget.CircleImageView
+        <com.wangdaye.mysplash.common.ui.widget.CircleImageView
             android:id="@+id/item_following_more_avatar"
             android:layout_width="@dimen/mini_icon_size"
             android:layout_height="@dimen/mini_icon_size"
             android:layout_margin="@dimen/normal_margin"
-            android:stateListAnimator="@animator/touch_rise"
+            android:stateListAnimator="@animator/touch_rise_avatar"
             android:layout_toRightOf="@id/item_following_more_title"
             android:layout_centerVertical="true"
             tools:src="@drawable/default_avatar"

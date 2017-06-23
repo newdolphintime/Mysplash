@@ -1,22 +1,20 @@
 package com.wangdaye.mysplash.main.presenter.activity;
 
-import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.i.presenter.MessageManagePresenter;
-import com.wangdaye.mysplash._common.i.view.MessageManageView;
-import com.wangdaye.mysplash._common._basic.MysplashActivity;
-import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
+import com.wangdaye.mysplash.common.i.presenter.MessageManagePresenter;
+import com.wangdaye.mysplash.common.i.view.MessageManageView;
 import com.wangdaye.mysplash.main.view.activity.MainActivity;
 
 /**
  * Message manage implementor.
+ *
+ * A {@link MessageManagePresenter} for {@link MainActivity}.
+ *
  * */
 
 public class MessageManageImplementor
         implements MessageManagePresenter {
-    // model & view.
-    private MessageManageView view;
 
-    /** <br> life cycle. */
+    private MessageManageView view;
 
     public MessageManageImplementor(MessageManageView view) {
         this.view = view;
@@ -28,27 +26,7 @@ public class MessageManageImplementor
     }
 
     @Override
-    public void responseMessage(final MysplashActivity a, int what, Object o) {
-        switch (what) {
-            case R.id.action_change_theme:
-                ((MainActivity) a).changeTheme();
-                break;
-
-            case R.id.action_download_manage:
-                IntentHelper.startDownloadManageActivity(a);
-                break;
-
-            case R.id.action_settings:
-                IntentHelper.startSettingsActivity(a);
-                break;
-
-            case R.id.action_about:
-                IntentHelper.startAboutActivity(a);
-                break;
-
-            default:
-                ((MainActivity) a).changeFragment(what);
-                break;
-        }
+    public void responseMessage(int what, Object o) {
+        view.responseMessage(what, o);
     }
 }

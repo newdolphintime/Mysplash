@@ -5,10 +5,10 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.i.presenter.PopupManagePresenter;
-import com.wangdaye.mysplash._common.i.view.PopupManageView;
-import com.wangdaye.mysplash._common.ui.popup.PhotoOrderPopupWindow;
-import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
+import com.wangdaye.mysplash.common.i.presenter.PopupManagePresenter;
+import com.wangdaye.mysplash.common.i.view.PopupManageView;
+import com.wangdaye.mysplash.common.ui.popup.PhotoOrderPopupWindow;
+import com.wangdaye.mysplash.common.utils.helper.NotificationHelper;
 
 /**
  * Popup manage implementor.
@@ -16,20 +16,16 @@ import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
 
 public class PopupManageImplementor
         implements PopupManagePresenter {
-    // model & view.
-    private PopupManageView view;
 
-    /** <br> life cycle. */
+    private PopupManageView view;
 
     public PopupManageImplementor(PopupManageView view) {
         this.view = view;
     }
 
-    /** <br> presenter. */
-
     @Override
     public void showPopup(Context c, View anchor, String value, final int position) {
-        if (position % 2 == 0) {
+        if (position != 2) {
             PhotoOrderPopupWindow window = new PhotoOrderPopupWindow(
                     c,
                     anchor,

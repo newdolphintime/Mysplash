@@ -3,11 +3,11 @@ package com.wangdaye.mysplash.user.model.widget;
 import android.app.Activity;
 
 import com.wangdaye.mysplash.Mysplash;
-import com.wangdaye.mysplash._common.data.entity.unsplash.Collection;
-import com.wangdaye.mysplash._common.data.entity.unsplash.User;
-import com.wangdaye.mysplash._common.data.service.CollectionService;
-import com.wangdaye.mysplash._common.i.model.CollectionsModel;
-import com.wangdaye.mysplash._common.ui.adapter.CollectionAdapter;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Collection;
+import com.wangdaye.mysplash.common.data.entity.unsplash.User;
+import com.wangdaye.mysplash.common.data.service.CollectionService;
+import com.wangdaye.mysplash.common.i.model.CollectionsModel;
+import com.wangdaye.mysplash.common.ui.adapter.CollectionAdapter;
 
 import java.util.ArrayList;
 
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class CollectionsObject
         implements CollectionsModel {
-    // data
+
     private CollectionAdapter adapter;
     private CollectionService service;
 
@@ -27,8 +27,6 @@ public class CollectionsObject
     private boolean refreshing;
     private boolean loading;
     private boolean over;
-
-    /** <br> life cycle. */
 
     public CollectionsObject(Activity a, User u) {
         this.adapter = new CollectionAdapter(a, new ArrayList<Collection>(Mysplash.DEFAULT_PER_PAGE));
@@ -41,8 +39,6 @@ public class CollectionsObject
         this.loading = false;
         this.over = false;
     }
-
-    /** <br> model. */
 
     @Override
     public CollectionAdapter getAdapter() {

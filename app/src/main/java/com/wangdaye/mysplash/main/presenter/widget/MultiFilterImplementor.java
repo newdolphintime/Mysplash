@@ -6,13 +6,13 @@ import android.widget.Toast;
 
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.data.entity.unsplash.Photo;
-import com.wangdaye.mysplash._common.data.service.PhotoService;
-import com.wangdaye.mysplash._common.i.model.MultiFilterModel;
-import com.wangdaye.mysplash._common.i.presenter.MultiFilterPresenter;
-import com.wangdaye.mysplash._common.i.view.MultiFilterView;
-import com.wangdaye.mysplash._common._basic.MysplashActivity;
-import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Photo;
+import com.wangdaye.mysplash.common.data.service.PhotoService;
+import com.wangdaye.mysplash.common.i.model.MultiFilterModel;
+import com.wangdaye.mysplash.common.i.presenter.MultiFilterPresenter;
+import com.wangdaye.mysplash.common.i.view.MultiFilterView;
+import com.wangdaye.mysplash.common._basic.MysplashActivity;
+import com.wangdaye.mysplash.common.ui.adapter.PhotoAdapter;
 
 import java.util.List;
 
@@ -21,25 +21,24 @@ import retrofit2.Response;
 
 /**
  * Multi-filter implementor.
+ *
+ * A {@link MultiFilterPresenter} for
+ * {@link com.wangdaye.mysplash.main.view.widget.MultiFilterPhotosView}.
+ *
  * */
 
 public class MultiFilterImplementor
         implements MultiFilterPresenter {
-    // model & view.
+
     private MultiFilterModel model;
     private MultiFilterView view;
 
-    // data
     private OnRequestPhotosListener listener;
-
-    /** <br> life cycle. */
 
     public MultiFilterImplementor(MultiFilterModel model, MultiFilterView view) {
         this.model = model;
         this.view = view;
     }
-
-    /** <br> presenter. */
 
     @Override
     public void requestPhotos(Context c, boolean refresh) {
@@ -183,10 +182,10 @@ public class MultiFilterImplementor
         return model.getAdapter();
     }
 
-    /** <br> interface. */
+    // interface.
 
     private class OnRequestPhotosListener implements PhotoService.OnRequestPhotosListener {
-        // data
+
         private Context c;
         private boolean refresh;
         private boolean canceled;

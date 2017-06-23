@@ -1,9 +1,9 @@
 package com.wangdaye.mysplash.user.model.widget;
 
-import com.wangdaye.mysplash._common.data.entity.unsplash.User;
-import com.wangdaye.mysplash._common.data.service.FollowingService;
-import com.wangdaye.mysplash._common.data.service.UserService;
-import com.wangdaye.mysplash._common.i.model.UserModel;
+import com.wangdaye.mysplash.common.data.entity.unsplash.User;
+import com.wangdaye.mysplash.common.data.service.FollowingService;
+import com.wangdaye.mysplash.common.data.service.UserService;
+import com.wangdaye.mysplash.common.i.model.UserModel;
 
 /**
  * User object.
@@ -11,19 +11,15 @@ import com.wangdaye.mysplash._common.i.model.UserModel;
 
 public class UserObject
         implements UserModel {
-    // data
+
     private UserService userService;
     private FollowingService followingService;
     private User user = null;
-
-    /** <br> life cycle. */
 
     public UserObject() {
         userService = UserService.getService();
         followingService = FollowingService.getService();
     }
-
-    /** <br> model. */
 
     @Override
     public UserService getUserService() {

@@ -6,36 +6,35 @@ import android.widget.Toast;
 
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.data.entity.unsplash.SearchPhotosResult;
-import com.wangdaye.mysplash._common.data.service.SearchService;
-import com.wangdaye.mysplash._common.i.model.SearchModel;
-import com.wangdaye.mysplash._common.i.presenter.SearchPresenter;
-import com.wangdaye.mysplash._common.i.view.SearchView;
-import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
+import com.wangdaye.mysplash.common.data.entity.unsplash.SearchPhotosResult;
+import com.wangdaye.mysplash.common.data.service.SearchService;
+import com.wangdaye.mysplash.common.i.model.SearchModel;
+import com.wangdaye.mysplash.common.i.presenter.SearchPresenter;
+import com.wangdaye.mysplash.common.i.view.SearchView;
+import com.wangdaye.mysplash.common.ui.adapter.PhotoAdapter;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
 /**
- * Search implementor.
+ * Search photos implementor.
+ *
+ * A {@link SearchPresenter} for {@link com.wangdaye.mysplash.main.view.widget.HomeSearchView}.
+ *
  * */
 
 public class SearchPhotosImplementor
         implements SearchPresenter {
-    // model & view.
+
     private SearchModel model;
     private SearchView view;
 
     private OnRequestPhotosListener listener;
 
-    /** <br> life cycle. */
-
     public SearchPhotosImplementor(SearchModel model, SearchView view) {
         this.model = model;
         this.view = view;
     }
-
-    /** <br> presenter. */
 
     @Override
     public void requestPhotos(Context c, int page, boolean refresh) {
@@ -45,7 +44,7 @@ public class SearchPhotosImplementor
             } else {
                 model.setLoading(true);
             }
-            page = refresh ? 1 : page + 1;
+            page = Math.max(1, refresh ? 1 : page + 1);
             listener = new OnRequestPhotosListener(c, page, refresh);
             model.getService()
                     .searchPhotos(
@@ -134,10 +133,10 @@ public class SearchPhotosImplementor
         return model.getAdapter();
     }
 
-    /** >br> interface. */
+    // interface.
 
     private class OnRequestPhotosListener implements SearchService.OnRequestPhotosListener {
-        // data
+
         private Context c;
         private int page;
         private boolean refresh;

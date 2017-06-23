@@ -7,15 +7,15 @@ import android.view.View;
 
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.i.presenter.PopupManagePresenter;
-import com.wangdaye.mysplash._common.i.view.PopupManageView;
-import com.wangdaye.mysplash._common._basic.MysplashActivity;
-import com.wangdaye.mysplash._common.ui.popup.MeMenuPopupWindow;
-import com.wangdaye.mysplash._common.ui.popup.PhotoOrderPopupWindow;
-import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
-import com.wangdaye.mysplash._common.utils.ShareUtils;
-import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
-import com.wangdaye.mysplash._common.utils.manager.AuthManager;
+import com.wangdaye.mysplash.common.i.presenter.PopupManagePresenter;
+import com.wangdaye.mysplash.common.i.view.PopupManageView;
+import com.wangdaye.mysplash.common._basic.MysplashActivity;
+import com.wangdaye.mysplash.common.ui.popup.MeMenuPopupWindow;
+import com.wangdaye.mysplash.common.ui.popup.PhotoOrderPopupWindow;
+import com.wangdaye.mysplash.common.utils.helper.NotificationHelper;
+import com.wangdaye.mysplash.common.utils.ShareUtils;
+import com.wangdaye.mysplash.common.utils.helper.IntentHelper;
+import com.wangdaye.mysplash.common.utils.manager.AuthManager;
 
 /**
  * Popup manage implementor.
@@ -24,23 +24,19 @@ import com.wangdaye.mysplash._common.utils.manager.AuthManager;
 public class PopupManageImplementor
         implements PopupManagePresenter,
         MeMenuPopupWindow.OnSelectItemListener {
-    // model & view.
-    private PopupManageView view;
 
-    /** <br> life cycle. */
+    private PopupManageView view;
 
     public PopupManageImplementor(PopupManageView view) {
         this.view = view;
     }
-
-    /** <br> presenter. */
 
     @Override
     public void showPopup(Context c, View anchor, String value, final int position) {
         if (position < 0) {
             MeMenuPopupWindow window = new MeMenuPopupWindow(c, anchor);
             window.setOnSelectItemListener(this);
-        } else if (position % 2 == 0) {
+        } else if (position != 2) {
             PhotoOrderPopupWindow window = new PhotoOrderPopupWindow(
                     c,
                     anchor,
@@ -59,13 +55,16 @@ public class PopupManageImplementor
         }
     }
 
-    /** <br> interface. */
+    // interface.
 
     // on select item swipeListener.
 
     @Override
     public void onSelectItem(int id) {
         MysplashActivity a = Mysplash.getInstance().getTopActivity();
+        if (a == null) {
+            return;
+        }
         switch (id) {
             case MeMenuPopupWindow.ITEM_SUBMIT:
                 IntentHelper.startWebActivity(a, Mysplash.UNSPLASH_SUBMIT_URL);

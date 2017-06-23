@@ -1,18 +1,21 @@
 package com.wangdaye.mysplash.main.model.widget;
 
 import com.wangdaye.mysplash.Mysplash;
-import com.wangdaye.mysplash._common.data.service.SearchService;
-import com.wangdaye.mysplash._common.i.model.SearchModel;
-import com.wangdaye.mysplash._common._basic.MysplashActivity;
-import com.wangdaye.mysplash._common.ui.adapter.UserAdapter;
+import com.wangdaye.mysplash.common.data.service.SearchService;
+import com.wangdaye.mysplash.common.i.model.SearchModel;
+import com.wangdaye.mysplash.common._basic.MysplashActivity;
+import com.wangdaye.mysplash.common.ui.adapter.UserAdapter;
 
 /**
  * Search users object.
+ *
+ * A {@link SearchModel} for {@link com.wangdaye.mysplash.main.view.widget.HomeSearchView}.
+ *
  * */
 
 public class SearchUsersObject
         implements SearchModel {
-    // data
+
     private UserAdapter adapter;
     private SearchService service;
 
@@ -23,8 +26,6 @@ public class SearchUsersObject
     private boolean refreshing;
     private boolean loading;
     private boolean over;
-
-    /** <br> life cycle. */
 
     public SearchUsersObject(UserAdapter adapter) {
         this.adapter = adapter;

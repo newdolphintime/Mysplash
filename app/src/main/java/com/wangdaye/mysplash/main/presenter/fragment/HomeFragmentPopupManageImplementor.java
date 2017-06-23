@@ -3,27 +3,26 @@ package com.wangdaye.mysplash.main.presenter.fragment;
 import android.content.Context;
 import android.view.View;
 
-import com.wangdaye.mysplash._common.i.presenter.PopupManagePresenter;
-import com.wangdaye.mysplash._common.i.view.PopupManageView;
-import com.wangdaye.mysplash._common.ui.popup.CollectionTypePopupWindow;
-import com.wangdaye.mysplash._common.ui.popup.PhotoOrderPopupWindow;
+import com.wangdaye.mysplash.common.i.presenter.PopupManagePresenter;
+import com.wangdaye.mysplash.common.i.view.PopupManageView;
+import com.wangdaye.mysplash.common.ui.popup.CollectionTypePopupWindow;
+import com.wangdaye.mysplash.common.ui.popup.PhotoOrderPopupWindow;
 
 /**
  * Popup manage implementor.
+ *
+ * A {@link PopupManagePresenter} for {@link com.wangdaye.mysplash.main.view.fragment.HomeFragment}.
+ *
  * */
 
 public class HomeFragmentPopupManageImplementor
         implements PopupManagePresenter {
-    // model & view.
-    private PopupManageView view;
 
-    /** <br> life cycle. */
+    private PopupManageView view;
 
     public HomeFragmentPopupManageImplementor(PopupManageView view) {
         this.view = view;
     }
-
-    /** <br> presenter. */
 
     @Override
     public void showPopup(Context c, View anchor, String value, final int position) {

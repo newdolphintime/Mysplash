@@ -1,8 +1,10 @@
 package com.wangdaye.mysplash.collection.model.widget;
 
-import com.wangdaye.mysplash._common.data.service.PhotoService;
-import com.wangdaye.mysplash._common.i.model.PhotosModel;
-import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
+import android.support.annotation.IntDef;
+
+import com.wangdaye.mysplash.common.data.service.PhotoService;
+import com.wangdaye.mysplash.common.i.model.PhotosModel;
+import com.wangdaye.mysplash.common.ui.adapter.PhotoAdapter;
 
 import java.util.List;
 
@@ -10,12 +12,14 @@ import java.util.List;
  * Photos object.
  * */
 
-public class PhotosObject implements PhotosModel {
-    // data
+public class PhotosObject
+        implements PhotosModel {
+
     private PhotoAdapter adapter;
     private PhotoService service;
 
     private Object key;
+    @TypeRule
     private int photosType;
 
     private int photosPage;
@@ -26,10 +30,10 @@ public class PhotosObject implements PhotosModel {
 
     public static final int PHOTOS_TYPE_NORMAL = 0;
     public static final int PHOTOS_TYPE_CURATED = 1;
+    @IntDef({PHOTOS_TYPE_NORMAL, PHOTOS_TYPE_CURATED})
+    private @interface TypeRule {}
 
-    /** <br> life cycle. */
-
-    public PhotosObject(PhotoAdapter adapter, Object key, int photosType) {
+    public PhotosObject(PhotoAdapter adapter, Object key, @TypeRule int photosType) {
         this.adapter = adapter;
         this.service = PhotoService.getService();
 
@@ -43,8 +47,6 @@ public class PhotosObject implements PhotosModel {
         this.over = false;
     }
 
-    /** <br> model. */
-
     @Override
     public PhotoAdapter getAdapter() {
         return adapter;
@@ -54,6 +56,8 @@ public class PhotosObject implements PhotosModel {
     public PhotoService getService() {
         return service;
     }
+
+    // control HTTP request parameters.
 
     @Override
     public Object getRequestKey() {
@@ -66,6 +70,7 @@ public class PhotosObject implements PhotosModel {
     }
 
     @Override
+    @TypeRule
     public int getPhotosType() {
         return photosType;
     }
@@ -104,6 +109,8 @@ public class PhotosObject implements PhotosModel {
     public void setPageList(List<Integer> list) {
         // do nothing.
     }
+
+    // control load state.
 
     @Override
     public boolean isRefreshing() {

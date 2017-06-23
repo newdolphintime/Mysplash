@@ -2,11 +2,13 @@ package com.wangdaye.mysplash.collection.presenter.activity;
 
 import android.net.Uri;
 
-import com.wangdaye.mysplash._common.data.entity.unsplash.Collection;
-import com.wangdaye.mysplash._common.data.service.CollectionService;
-import com.wangdaye.mysplash._common.i.model.BrowsableModel;
-import com.wangdaye.mysplash._common.i.presenter.BrowsablePresenter;
-import com.wangdaye.mysplash._common.i.view.BrowsableView;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Collection;
+import com.wangdaye.mysplash.common.data.service.CollectionService;
+import com.wangdaye.mysplash.common.i.model.BrowsableModel;
+import com.wangdaye.mysplash.common.i.presenter.BrowsablePresenter;
+import com.wangdaye.mysplash.common.i.view.BrowsableView;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -18,18 +20,14 @@ import retrofit2.Response;
 public class BrowsableImplementor
         implements BrowsablePresenter,
         CollectionService.OnRequestSingleCollectionListener {
-    // model & view.
+
     private BrowsableModel model;
     private BrowsableView view;
-
-    /** <br> life cycle. */
 
     public BrowsableImplementor(BrowsableModel model, BrowsableView view) {
         this.model = model;
         this.view = view;
     }
-
-    /** <br> presenter. */
 
     @Override
     public Uri getIntentUri() {
@@ -42,14 +40,14 @@ public class BrowsableImplementor
     }
 
     @Override
-    public void requestBrowsableData() {
-        view.showRequestDialog();
-        requestCollection();
+    public void visitPreviousPage() {
+        view.visitPreviousPage();
     }
 
     @Override
-    public void visitParentView() {
-        view.visitParentView();
+    public void requestBrowsableData() {
+        view.showRequestDialog();
+        requestCollection();
     }
 
     @Override
@@ -57,18 +55,18 @@ public class BrowsableImplementor
         ((CollectionService) model.getService()).cancel();
     }
 
-    /** <br> utils. */
-
     private void requestCollection() {
-        String[] keys = model.getBrowsableDataKey().split(",");
-        if (keys[1].equals("curated")) {
-            ((CollectionService) model.getService()).requestACuratedCollections(keys[2], this);
+        List<String> keyList = model.getBrowsableDataKey();
+        if (keyList.get(1).equals("curated")) {
+            ((CollectionService) model.getService()).requestACuratedCollections(keyList.get(2), this);
         } else {
-            ((CollectionService) model.getService()).requestACollections(keys[1], this);
+            ((CollectionService) model.getService()).requestACollections(keyList.get(1), this);
         }
     }
 
-    /** <br> swipeListener. */
+    // interface.
+
+    // on request single collection listener.
 
     @Override
     public void onRequestSingleCollectionSuccess(Call<Collection> call, Response<Collection> response) {

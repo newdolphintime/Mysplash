@@ -1,61 +1,60 @@
 package com.wangdaye.mysplash.photo.view.activity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
 
-import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.data.entity.item.DownloadMission;
-import com.wangdaye.mysplash._common.data.entity.table.DownloadMissionEntity;
-import com.wangdaye.mysplash._common.data.entity.unsplash.Photo;
-import com.wangdaye.mysplash._common.i.presenter.MessageManagePresenter;
-import com.wangdaye.mysplash._common.i.view.MessageManageView;
-import com.wangdaye.mysplash._common._basic.MysplashActivity;
-import com.wangdaye.mysplash._common.ui.dialog.DownloadRepeatDialog;
-import com.wangdaye.mysplash._common.ui.widget.PhotoDownloadView;
-import com.wangdaye.mysplash._common.ui.widget.coordinatorView.StatusBarView;
-import com.wangdaye.mysplash._common.ui.widget.SwipeBackCoordinatorLayout;
-import com.wangdaye.mysplash._common.utils.FileUtils;
-import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
-import com.wangdaye.mysplash._common.utils.helper.DatabaseHelper;
-import com.wangdaye.mysplash._common.utils.helper.DownloadHelper;
-import com.wangdaye.mysplash._common.i.model.BrowsableModel;
-import com.wangdaye.mysplash._common.i.model.DownloadModel;
-import com.wangdaye.mysplash._common.i.model.PhotoInfoModel;
-import com.wangdaye.mysplash._common.i.presenter.BrowsablePresenter;
-import com.wangdaye.mysplash._common.i.presenter.DownloadPresenter;
-import com.wangdaye.mysplash._common.i.presenter.PhotoInfoPresenter;
-import com.wangdaye.mysplash._common.i.presenter.PopupManagePresenter;
-import com.wangdaye.mysplash._common.i.view.BrowsableView;
-import com.wangdaye.mysplash._common.i.view.PhotoInfoView;
-import com.wangdaye.mysplash._common.i.view.PopupManageView;
-import com.wangdaye.mysplash._common.ui.dialog.RequestBrowsableDataDialog;
-import com.wangdaye.mysplash._common.ui.dialog.StatsDialog;
-import com.wangdaye.mysplash._common.ui.popup.PhotoMenuPopupWindow;
-import com.wangdaye.mysplash._common.utils.AnimUtils;
-import com.wangdaye.mysplash._common.utils.DisplayUtils;
-import com.wangdaye.mysplash._common.ui.widget.freedomSizeView.FreedomImageView;
-import com.wangdaye.mysplash._common.utils.helper.ImageHelper;
-import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
-import com.wangdaye.mysplash._common.utils.manager.ThreadManager;
-import com.wangdaye.mysplash._common._basic.FlagRunnable;
-import com.wangdaye.mysplash._common.utils.widget.SafeHandler;
+import com.wangdaye.mysplash.common._basic.ReadWriteActivity;
+import com.wangdaye.mysplash.common.data.entity.item.DownloadMission;
+import com.wangdaye.mysplash.common.data.entity.table.DownloadMissionEntity;
+import com.wangdaye.mysplash.common.data.entity.unsplash.Photo;
+import com.wangdaye.mysplash.common.i.presenter.MessageManagePresenter;
+import com.wangdaye.mysplash.common.i.view.MessageManageView;
+import com.wangdaye.mysplash.common.ui.adapter.PhotoInfoAdapter;
+import com.wangdaye.mysplash.common.ui.dialog.DownloadRepeatDialog;
+import com.wangdaye.mysplash.common.ui.widget.PhotoDownloadView;
+import com.wangdaye.mysplash.common.ui.widget.coordinatorView.StatusBarView;
+import com.wangdaye.mysplash.common.ui.widget.SwipeBackCoordinatorLayout;
+import com.wangdaye.mysplash.common.utils.FileUtils;
+import com.wangdaye.mysplash.common.utils.helper.NotificationHelper;
+import com.wangdaye.mysplash.common.utils.helper.DatabaseHelper;
+import com.wangdaye.mysplash.common.utils.helper.DownloadHelper;
+import com.wangdaye.mysplash.common.i.model.BrowsableModel;
+import com.wangdaye.mysplash.common.i.model.DownloadModel;
+import com.wangdaye.mysplash.common.i.model.PhotoInfoModel;
+import com.wangdaye.mysplash.common.i.presenter.BrowsablePresenter;
+import com.wangdaye.mysplash.common.i.presenter.DownloadPresenter;
+import com.wangdaye.mysplash.common.i.presenter.PhotoInfoPresenter;
+import com.wangdaye.mysplash.common.i.presenter.PopupManagePresenter;
+import com.wangdaye.mysplash.common.i.view.BrowsableView;
+import com.wangdaye.mysplash.common.i.view.PhotoInfoView;
+import com.wangdaye.mysplash.common.i.view.PopupManageView;
+import com.wangdaye.mysplash.common.ui.dialog.RequestBrowsableDataDialog;
+import com.wangdaye.mysplash.common.ui.dialog.StatsDialog;
+import com.wangdaye.mysplash.common.ui.popup.PhotoMenuPopupWindow;
+import com.wangdaye.mysplash.common.utils.AnimUtils;
+import com.wangdaye.mysplash.common.utils.DisplayUtils;
+import com.wangdaye.mysplash.common.ui.widget.freedomSizeView.FreedomImageView;
+import com.wangdaye.mysplash.common.utils.helper.ImageHelper;
+import com.wangdaye.mysplash.common.utils.helper.IntentHelper;
+import com.wangdaye.mysplash.common.utils.manager.ThemeManager;
+import com.wangdaye.mysplash.common.utils.manager.ThreadManager;
+import com.wangdaye.mysplash.common._basic.FlagRunnable;
+import com.wangdaye.mysplash.common.utils.widget.SafeHandler;
 import com.wangdaye.mysplash.photo.model.BorwsableObject;
 import com.wangdaye.mysplash.photo.model.DownloadObject;
 import com.wangdaye.mysplash.photo.model.PhotoInfoObject;
@@ -65,47 +64,84 @@ import com.wangdaye.mysplash.photo.presenter.MessageManageImplementor;
 import com.wangdaye.mysplash.photo.presenter.PhotoActivityPopupManageImplementor;
 import com.wangdaye.mysplash.photo.presenter.PhotoInfoImplementor;
 import com.wangdaye.mysplash.photo.view.holder.BaseHolder;
+import com.wangdaye.mysplash.photo.view.holder.BaseLandscapeHolder;
 import com.wangdaye.mysplash.photo.view.holder.MoreHolder;
 import com.wangdaye.mysplash.photo.view.holder.ProgressHolder;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Photo activity.
+ *
+ * This activity is used to show details of a photo.
+ *
  * */
 
-public class PhotoActivity extends MysplashActivity
+public class PhotoActivity extends ReadWriteActivity
         implements PhotoInfoView, PopupManageView, BrowsableView, MessageManageView,
         DownloadRepeatDialog.OnCheckOrDownloadListener, SwipeBackCoordinatorLayout.OnSwipeListener,
         SafeHandler.HandlerContainer {
-    // model.
-    private PhotoInfoModel photoInfoModel;
-    private DownloadModel downloadModel;
-    private BrowsableModel browsableModel;
 
-    // view.
+    @BindView(R.id.activity_photo_container)
+    CoordinatorLayout container;
+
+    @BindView(R.id.activity_photo_image)
+    FreedomImageView photoImage;
+
+    @BindView(R.id.activity_photo_recyclerView)
+    RecyclerView recyclerView;
+
+    @BindView(R.id.activity_photo_translucentStatusBar)
+    StatusBarView translucentStatusBar;
+
+    @BindView(R.id.activity_photo_statusBar)
+    StatusBarView statusBar;
+
     private RequestBrowsableDataDialog requestDialog;
-
-    private CoordinatorLayout container;
-    private FreedomImageView photoImage;
-
-    private RecyclerView recyclerView;
-
-    private StatusBarView statusBar;
-    private StatusBarView flowStatusBar;
-
     private SafeHandler<PhotoActivity> handler;
 
-    // presenter.
+    private PhotoInfoModel photoInfoModel;
     private PhotoInfoPresenter photoInfoPresenter;
+
+    private DownloadModel downloadModel;
     private DownloadPresenter downloadPresenter;
+
     private PopupManagePresenter popupManagePresenter;
+
+    private BrowsableModel browsableModel;
     private BrowsablePresenter browsablePresenter;
+
     private MessageManagePresenter messageManagePresenter;
 
-    // data
     public static final String KEY_PHOTO_ACTIVITY_PHOTO = "photo_activity_photo";
     public static final String KEY_PHOTO_ACTIVITY_ID = "photo_activity_id";
 
-    /** <br> life cycle. */
+    /**
+     * This runnable is used to poll download progress.
+     * */
+    private FlagRunnable progressRunnable = new FlagRunnable(false) {
+        @Override
+        public void run() {
+            while (isRunning()) {
+                DownloadMissionEntity entity = DatabaseHelper.getInstance(PhotoActivity.this)
+                        .readDownloadingEntity(photoInfoPresenter.getPhoto().id);
+                if (entity != null && entity.missionId != -1
+                        && entity.result == DownloadHelper.RESULT_DOWNLOADING) {
+                    DownloadMission mission = DownloadHelper.getInstance(PhotoActivity.this)
+                            .getDownloadMission(PhotoActivity.this, entity.missionId);
+                    if (mission == null || mission.entity.result != DownloadHelper.RESULT_DOWNLOADING) {
+                        messageManagePresenter.sendMessage(-1, null);
+                    } else {
+                        messageManagePresenter.sendMessage((int) mission.process, null);
+                    }
+                } else {
+                    messageManagePresenter.sendMessage(-1, null);
+                }
+                SystemClock.sleep(200);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +150,6 @@ public class PhotoActivity extends MysplashActivity
         setContentView(R.layout.activity_photo);
         initModel();
         initPresenter();
-        runnable.setRunning(false);
     }
 
     @Override
@@ -122,8 +157,36 @@ public class PhotoActivity extends MysplashActivity
         super.onStart();
         if (!isStarted()) {
             setStarted();
+            ButterKnife.bind(this);
             initView(true);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        browsablePresenter.cancelRequest();
+        photoInfoPresenter.cancelRequest();
+        progressRunnable.setRunning(false);
+    }
+
+    @Override
+    protected void setTheme() {
+        if (ThemeManager.getInstance(this).isLightTheme()) {
+            setTheme(R.style.MysplashTheme_light_Translucent_Photo);
+        } else {
+            setTheme(R.style.MysplashTheme_dark_Translucent_Photo);
+        }
+    }
+
+    @Override
+    protected boolean operateStatusBarBySelf() {
+        return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // do nothing.
     }
 
     @Override
@@ -132,39 +195,19 @@ public class PhotoActivity extends MysplashActivity
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        browsablePresenter.cancelRequest();
-        photoInfoPresenter.cancelRequest();
-        runnable.setRunning(false);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        // do nothing.
-    }
-
-    @Override
-    protected void setTheme() {
-        if (Mysplash.getInstance().isLightTheme()) {
-            setTheme(R.style.MysplashTheme_light_Translucent_Photo);
-        } else {
-            setTheme(R.style.MysplashTheme_dark_Translucent_Photo);
-        }
-    }
-
-    @Override
     protected void backToTop() {
         // do nothing.
     }
 
     @Override
-    protected boolean isFullScreen() {
-        return false;
-    }
-
-    @Override
     public void finishActivity(int dir) {
+        Intent result = new Intent();
+        result.putExtra(
+                KEY_PHOTO_ACTIVITY_PHOTO,
+                getIntent().getParcelableExtra(KEY_PHOTO_ACTIVITY_PHOTO));
+        setResult(RESULT_OK, result);
+
+        recyclerView.setAlpha(0f);
         SwipeBackCoordinatorLayout.hideBackgroundShadow(container);
         if (!browsablePresenter.isBrowsable()
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -184,11 +227,18 @@ public class PhotoActivity extends MysplashActivity
     }
 
     @Override
-    public View getSnackbarContainer() {
+    public CoordinatorLayout getSnackbarContainer() {
         return container;
     }
 
-    /** <br> presenter. */
+    // init.
+
+    private void initModel() {
+        this.photoInfoModel = new PhotoInfoObject(
+                this, (Photo) getIntent().getParcelableExtra(KEY_PHOTO_ACTIVITY_PHOTO));
+        this.downloadModel = new DownloadObject(photoInfoModel.getPhoto());
+        this.browsableModel = new BorwsableObject(getIntent());
+    }
 
     private void initPresenter() {
         this.photoInfoPresenter = new PhotoInfoImplementor(photoInfoModel, this);
@@ -198,25 +248,18 @@ public class PhotoActivity extends MysplashActivity
         this.messageManagePresenter = new MessageManageImplementor(this);
     }
 
-    /** <br> view. */
-
-    // init.
-
     @SuppressLint({"SetTextI18n", "CutPasteId"})
     private void initView(boolean init) {
         this.handler = new SafeHandler<>(this);
-
         if (init && browsablePresenter.isBrowsable() && photoInfoPresenter.getPhoto() == null) {
             browsablePresenter.requestBrowsableData();
         } else {
-            this.container = (CoordinatorLayout) findViewById(R.id.activity_photo_container);
-
-            SwipeBackCoordinatorLayout swipeBackView
-                    = (SwipeBackCoordinatorLayout) findViewById(R.id.activity_photo_swipeBackView);
+            SwipeBackCoordinatorLayout swipeBackView = ButterKnife.findById(
+                    this, R.id.activity_photo_swipeBackView);
             swipeBackView.setOnSwipeListener(this);
 
-            this.photoImage = (FreedomImageView) findViewById(R.id.activity_photo_image);
-            photoImage.setSize(photoInfoPresenter.getPhoto().width, photoInfoPresenter.getPhoto().height);
+            photoImage.setSize(
+                    photoInfoPresenter.getPhoto().width, photoInfoPresenter.getPhoto().height);
             ImageHelper.loadRegularPhoto(
                     this, photoImage, photoInfoPresenter.getPhoto(),
                     new ImageHelper.OnLoadImageListener() {
@@ -235,24 +278,25 @@ public class PhotoActivity extends MysplashActivity
                 }
             });
 
-            this.recyclerView = (RecyclerView) findViewById(R.id.activity_photo_recyclerView);
+            recyclerView.setAdapter(photoInfoPresenter.getAdapter());
+            int columnCount;
+            if (DisplayUtils.isLandscape(this)) {
+                columnCount = 2;
+            } else {
+                columnCount = 1;
+            }
+            GridLayoutManager layoutManager = new GridLayoutManager(this, columnCount);
+            layoutManager.setSpanSizeLookup(
+                    new PhotoInfoAdapter.SpanSizeLookup(
+                            photoInfoPresenter.getAdapter(), columnCount));
+            recyclerView.setLayoutManager(layoutManager);
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 recyclerView.addOnScrollListener(new OnScrollListener((photoInfoPresenter.getPhoto())));
             } else {
                 recyclerView.addOnScrollListener(new MScrollListener((photoInfoPresenter.getPhoto())));
             }
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.setAdapter(photoInfoPresenter.getAdapter());
 
-            this.statusBar = (StatusBarView) findViewById(R.id.activity_photo_statusBar);
-            statusBar.setAlpha(0.1f);
-
-            this.flowStatusBar = (StatusBarView) findViewById(R.id.activity_photo_flowStatusBar);
-            if (DisplayUtils.isNeedSetStatusBarMask()) {
-                flowStatusBar.setBackgroundResource(R.color.colorPrimary_light);
-                flowStatusBar.setMask(true);
-            }
-            flowStatusBar.setAlpha(0f);
+            statusBar.setAlpha(0f);
 
             if (!photoInfoPresenter.getPhoto().complete) {
                 initRefresh();
@@ -260,42 +304,64 @@ public class PhotoActivity extends MysplashActivity
         }
     }
 
-    // interface.
+    // control.
+
+    public void visitParentActivity() {
+        browsablePresenter.visitPreviousPage();
+    }
+
+    public boolean isBrowsable() {
+        return browsablePresenter.isBrowsable();
+    }
+
+    public Photo getPhoto() {
+        return photoInfoPresenter.getPhoto();
+    }
+
+    // HTTP request.
 
     public void initRefresh() {
         photoInfoPresenter.requestPhoto(this);
     }
 
-    public void visitParentActivity() {
-        browsablePresenter.visitParentView();
+    public boolean isLoadFailed() {
+        return photoInfoPresenter.isFailed();
     }
 
-    public void showPopup(Context c, View anchor, String value, int position) {
-        popupManagePresenter.showPopup(c, anchor, value, position);
-    }
+    // UI.
 
     @Nullable
     private PhotoDownloadView getPhotoDownloadView() {
-        LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        GridLayoutManager manager = (GridLayoutManager) recyclerView.getLayoutManager();
         int firstVisibleItemPosition = manager.findFirstVisibleItemPosition();
         int lastVisibleItemPosition = manager.findLastVisibleItemPosition();
         if (firstVisibleItemPosition <= 1 && 1 <= lastVisibleItemPosition) {
-            return ((BaseHolder) recyclerView.findViewHolderForAdapterPosition(1)).getDownloadView();
+            PhotoInfoAdapter.ViewHolder holder
+                    = (PhotoInfoAdapter.ViewHolder) recyclerView.findViewHolderForAdapterPosition(1);
+            if (holder instanceof BaseHolder) {
+                return ((BaseHolder) holder).getDownloadView();
+            } else if (holder instanceof BaseLandscapeHolder) {
+                return ((BaseLandscapeHolder) holder).getDownloadView();
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
     }
 
     @Nullable
-    private ImageView getMoreImage() {
+    private ViewPager getMoreImageContainer() {
         if (!photoInfoPresenter.getAdapter().isComplete()) {
             return null;
         } else {
-            int lastVisibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
+            int lastVisibleItemPosition = ((GridLayoutManager) recyclerView.getLayoutManager())
+                    .findLastVisibleItemPosition();
             if (lastVisibleItemPosition == photoInfoPresenter.getAdapter().getItemCount() - 1) {
-                RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(lastVisibleItemPosition);
+                RecyclerView.ViewHolder holder
+                        = recyclerView.findViewHolderForAdapterPosition(lastVisibleItemPosition);
                 if (holder instanceof MoreHolder) {
-                    return ((MoreHolder) holder).getImageView();
+                    return ((MoreHolder) holder).getViewPager();
                 } else {
                     return null;
                 }
@@ -305,21 +371,15 @@ public class PhotoActivity extends MysplashActivity
         }
     }
 
-    /** <br> model. */
-
-    // init.
-
-    private void initModel() {
-        this.photoInfoModel = new PhotoInfoObject(
-                this, (Photo) getIntent().getParcelableExtra(KEY_PHOTO_ACTIVITY_PHOTO));
-        this.downloadModel = new DownloadObject(photoInfoModel.getPhoto());
-        this.browsableModel = new BorwsableObject(getIntent());
+    public void showPopup(Context c, View anchor, String value, int position) {
+        popupManagePresenter.showPopup(c, anchor, value, position);
     }
 
-    // interface.
+    // download.
 
     public void readyToDownload(int type) {
-        if (DatabaseHelper.getInstance(this).readDownloadingEntityCount(photoInfoPresenter.getPhoto().id) > 0) {
+        if (DatabaseHelper.getInstance(this)
+                .readDownloadingEntityCount(photoInfoPresenter.getPhoto().id) > 0) {
             NotificationHelper.showSnackbar(
                     getString(R.string.feedback_download_repeat),
                     Snackbar.LENGTH_SHORT);
@@ -332,7 +392,7 @@ public class PhotoActivity extends MysplashActivity
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 downloadByType(type);
             } else {
-                requestPermission(Mysplash.WRITE_EXTERNAL_STORAGE, type);
+                requestReadWritePermission(type);
             }
         }
     }
@@ -358,65 +418,23 @@ public class PhotoActivity extends MysplashActivity
         startCheckDownloadProgressThread();
     }
 
-    public boolean isBrowsable() {
-        return browsablePresenter.isBrowsable();
-    }
-
     public void startCheckDownloadProgressThread() {
-        if (!runnable.isRunning()) {
-            runnable.setRunning(true);
-            ThreadManager.getInstance().execute(runnable);
+        if (!progressRunnable.isRunning()) {
+            progressRunnable.setRunning(true);
+            ThreadManager.getInstance().execute(progressRunnable);
         }
     }
 
-    public Photo getPhoto() {
-        return photoInfoPresenter.getPhoto();
-    }
-
-    public boolean isLoadFailed() {
-        return photoInfoPresenter.isFailed();
-    }
-
-    /** <br> permission. */
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void requestPermission(int permissionCode, int type) {
-        switch (permissionCode) {
-            case Mysplash.WRITE_EXTERNAL_STORAGE:
-                if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    this.requestPermissions(
-                            new String[] {
-                                    Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            type);
-                } else {
-                    downloadByType(type);
-                }
-                break;
-        }
-    }
+    // permission.
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permission, @NonNull int[] grantResult) {
-        super.onRequestPermissionsResult(requestCode, permission, grantResult);
-        for (int i = 0; i < permission.length; i ++) {
-            switch (permission[i]) {
-                case Manifest.permission.WRITE_EXTERNAL_STORAGE:
-                    if (grantResult[i] == PackageManager.PERMISSION_GRANTED) {
-                        downloadByType(requestCode);
-                    } else {
-                        NotificationHelper.showSnackbar(
-                                getString(R.string.feedback_need_permission),
-                                Snackbar.LENGTH_SHORT);
-                    }
-                    break;
-            }
-        }
+    protected void requestReadWritePermissionSucceed(int requestCode) {
+        downloadByType(requestCode);
     }
 
-    /** <br> interface. */
+    // interface.
 
-    // on check or download swipeListener.
+    // on check or download listener.
 
     @Override
     public void onCheck(Object obj) {
@@ -430,14 +448,17 @@ public class PhotoActivity extends MysplashActivity
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             downloadByType((Integer) obj);
         } else {
-            requestPermission(Mysplash.WRITE_EXTERNAL_STORAGE, (Integer) obj);
+            requestReadWritePermission((Integer) obj);
         }
     }
 
-    // on scroll changed swipeListener.
+    // on scroll changed listener.
 
+    /**
+     * This listener is used to set footer image position and control the style of status bars.
+     * */
     private class OnScrollListener extends RecyclerView.OnScrollListener {
-        // data.
+
         int scrollY;
 
         float statusBarHeight;
@@ -448,20 +469,23 @@ public class PhotoActivity extends MysplashActivity
         // life cycle.
 
         OnScrollListener(Photo photo) {
-            DisplayUtils utils = new DisplayUtils(PhotoActivity.this);
-
             statusBarHeight = DisplayUtils.getStatusBarHeight(getResources());
             screenHeight = getResources().getDisplayMetrics().heightPixels;
-            footerHeight = utils.dpToPx(72);
+            footerHeight = getResources().getDimensionPixelSize(R.dimen.item_photo_more_vertical_height);
 
             int screenWidth = getResources().getDisplayMetrics().widthPixels;
             int screenHeight = getResources().getDisplayMetrics().heightPixels;
-            float limitHeight = screenHeight - utils.dpToPx(300);
+            float limitHeight = screenHeight
+                    - getResources().getDimensionPixelSize(R.dimen.photo_info_base_view_height);
 
-            if (1.0 * photo.height / photo.width * screenWidth <= limitHeight) {
-                showFlowStatusBarTrigger = limitHeight - statusBarHeight;
+            if (DisplayUtils.isLandscape(PhotoActivity.this)) {
+                showFlowStatusBarTrigger = getResources().getDisplayMetrics().heightPixels - statusBarHeight;
             } else {
-                showFlowStatusBarTrigger = screenWidth * photo.height / photo.width - statusBarHeight;
+                if (1.0 * photo.height / photo.width * screenWidth <= limitHeight) {
+                    showFlowStatusBarTrigger = limitHeight - statusBarHeight;
+                } else {
+                    showFlowStatusBarTrigger = screenWidth * photo.height / photo.width - statusBarHeight;
+                }
             }
         }
 
@@ -478,33 +502,33 @@ public class PhotoActivity extends MysplashActivity
 
             // status bar & toolbar.
             if (scrollY - dy < showFlowStatusBarTrigger && scrollY >= showFlowStatusBarTrigger) {
-                AnimUtils.animHide(statusBar, 150, statusBar.getAlpha(), 0, false);
-                AnimUtils.animShow(flowStatusBar, 150, flowStatusBar.getAlpha(), 1);
+                translucentStatusBar.animToDarkerAlpha();
+                AnimUtils.animShow(statusBar, 150, statusBar.getAlpha(), 1);
             } else if (scrollY - dy >= showFlowStatusBarTrigger && scrollY < showFlowStatusBarTrigger) {
-                AnimUtils.animHide(flowStatusBar, 150, flowStatusBar.getAlpha(), 0, false);
-                AnimUtils.animShow(statusBar, 150, statusBar.getAlpha(), 0.1f);
+                translucentStatusBar.animToInitAlpha();
+                AnimUtils.animHide(statusBar, 150, statusBar.getAlpha(), 0, false);
             }
 
             // more.
-            ImageView moreImage = getMoreImage();
-            if (moreImage != null) {
-                View moreButton = (View) moreImage.getParent();
-                moreImage.setTranslationY(
-                        (float) (0.5 * (recyclerView.getBottom() - moreButton.getTop() - footerHeight)));
+            ViewPager moreContainer = getMoreImageContainer();
+            if (moreContainer != null) {
+                moreContainer.setTranslationY(
+                        (float) (0.5 * (recyclerView.getBottom()
+                                - ((View) moreContainer.getParent()).getTop()
+                                - footerHeight)));
             }
         }
     }
 
+    /**
+     * This listener is used to control the text color for status bar. Only for Android M.
+     * */
     @RequiresApi(api = Build.VERSION_CODES.M)
     private class MScrollListener extends OnScrollListener {
-
-        // life cycle.
 
         MScrollListener(Photo photo) {
             super(photo);
         }
-
-        // interface.
 
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -517,11 +541,11 @@ public class PhotoActivity extends MysplashActivity
         }
     }
 
-    // on swipe swipeListener.
+    // on swipe listener.
 
     @Override
     public boolean canSwipeBack(int dir) {
-        return SwipeBackCoordinatorLayout.canSwipeBackForThisView(recyclerView, dir);
+        return SwipeBackCoordinatorLayout.canSwipeBack(recyclerView, dir);
     }
 
     @Override
@@ -538,7 +562,7 @@ public class PhotoActivity extends MysplashActivity
 
     @Override
     public void handleMessage(Message message) {
-        messageManagePresenter.responseMessage(this, message.what, message.obj);
+        messageManagePresenter.responseMessage(message.what, message.obj);
     }
 
     // view.
@@ -587,7 +611,7 @@ public class PhotoActivity extends MysplashActivity
 
     @Override
     public void requestPhotoFailed() {
-        if (((LinearLayoutManager) recyclerView.getLayoutManager())
+        if (((GridLayoutManager) recyclerView.getLayoutManager())
                 .findLastVisibleItemPosition() == 2) {
             ProgressHolder holder = (ProgressHolder) recyclerView.findViewHolderForAdapterPosition(2);
             holder.setFailedState();
@@ -624,7 +648,7 @@ public class PhotoActivity extends MysplashActivity
     }
 
     @Override
-    public void visitParentView() {
+    public void visitPreviousPage() {
         IntentHelper.startMainActivity(this);
     }
 
@@ -642,34 +666,9 @@ public class PhotoActivity extends MysplashActivity
             if (0 <= what && what <= 100) {
                 downloadView.setProcess(what);
             } else {
-                runnable.setRunning(false);
+                progressRunnable.setRunning(false);
                 downloadView.setButtonState();
             }
         }
     }
-
-    /** <br> inner class. */
-
-    private FlagRunnable runnable = new FlagRunnable(true) {
-        @Override
-        public void run() {
-            while (isRunning()) {
-                DownloadMissionEntity entity = DatabaseHelper.getInstance(PhotoActivity.this)
-                        .readDownloadingEntity(photoInfoPresenter.getPhoto().id);
-                if (entity != null && entity.missionId != -1
-                        && entity.result == DownloadHelper.RESULT_DOWNLOADING) {
-                    DownloadMission mission = DownloadHelper.getInstance(PhotoActivity.this)
-                            .getDownloadMission(PhotoActivity.this, entity.missionId);
-                    if (mission == null || mission.entity.result != DownloadHelper.RESULT_DOWNLOADING) {
-                        messageManagePresenter.sendMessage(-1, null);
-                    } else {
-                        messageManagePresenter.sendMessage((int) mission.process, null);
-                    }
-                } else {
-                    messageManagePresenter.sendMessage(-1, null);
-                }
-                SystemClock.sleep(200);
-            }
-        }
-    };
 }

@@ -1,6 +1,6 @@
 package com.wangdaye.mysplash.main.model.activity;
 
-import com.wangdaye.mysplash._common.i.model.DrawerModel;
+import com.wangdaye.mysplash.common.i.model.DrawerModel;
 
 /**
  * Drawer object.
@@ -8,16 +8,12 @@ import com.wangdaye.mysplash._common.i.model.DrawerModel;
 
 public class DrawerObject
         implements DrawerModel {
-    // data
-    private int checkedId;
 
-    /** <br> life cycle. */
+    private int checkedId;
 
     public DrawerObject(int id) {
         checkedId = id;
     }
-
-    /** <br> model. */
 
     @Override
     public int getCheckedItemId() {
