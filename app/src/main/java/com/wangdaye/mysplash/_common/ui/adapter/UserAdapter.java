@@ -1,10 +1,6 @@
 package com.wangdaye.mysplash._common.ui.adapter;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -15,25 +11,25 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
+import com.wangdaye.mysplash._common._basic.FooterAdapter;
 import com.wangdaye.mysplash._common.data.entity.unsplash.User;
-import com.wangdaye.mysplash._common.utils.DisplayUtils;
-import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.widget.CircleImageView;
+import com.wangdaye.mysplash._common.utils.DisplayUtils;
+import com.wangdaye.mysplash._common.utils.helper.ImageHelper;
+import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
+import com.wangdaye.mysplash.user.view.activity.UserActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * User adapter. (Recycler view)
  * */
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
+public class UserAdapter extends FooterAdapter<RecyclerView.ViewHolder> {
     // widget
     private Context a;
     private List<User> itemList;
@@ -45,79 +41,37 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         this.itemList = list;
     }
 
+    @Override
+    protected boolean hasFooter() {
+        return DisplayUtils.getNavigationBarHeight(a.getResources()) != 0;
+    }
+
+    @Override
+    public int getRealItemCount() {
+        return itemList.size();
+    }
+
     /** <br> UI. */
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user, parent, false);
-        return new ViewHolder(v);
-    }
-
-    @SuppressLint({"RecyclerView", "SetTextI18n"})
-    @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.title.setText(itemList.get(position).name);
-        if (TextUtils.isEmpty(itemList.get(position).bio)) {
-            holder.subtitle.setText(
-                    itemList.get(position).total_photos + a.getResources().getStringArray(R.array.user_tabs)[0] +
-                            + itemList.get(position).total_collections + " Collections, "
-                            + itemList.get(position).total_likes + " Likes");
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int position) {
+        if (isFooter(position)) {
+            // footer.
+            return FooterHolder.buildInstance(parent);
         } else {
-            holder.subtitle.setText(itemList.get(position).bio);
-        }
-
-        if (TextUtils.isEmpty(itemList.get(position).portfolio_url)) {
-            holder.portfolioBtn.setVisibility(View.GONE);
-        } else {
-            holder.portfolioBtn.setVisibility(View.VISIBLE);
-        }
-
-        if (Mysplash.getInstance().isLightTheme()) {
-            holder.portfolioBtn.setImageResource(R.drawable.ic_item_earth_light);
-        } else {
-            holder.portfolioBtn.setImageResource(R.drawable.ic_item_earth_dark);
-        }
-
-        if (itemList.get(position).profile_image != null) {
-            Glide.with(a)
-                    .load(itemList.get(position).profile_image.large)
-                    .listener(new RequestListener<String, GlideDrawable>() {
-                        @Override
-                        public boolean onResourceReady(GlideDrawable resource, String model,
-                                                       Target<GlideDrawable> target,
-                                                       boolean isFromMemoryCache, boolean isFirstResource) {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                            return false;
-                        }
-                    })
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .override(128, 128)
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .into(holder.avatar);
-        } else {
-            Glide.with(a)
-                    .load(R.drawable.default_avatar)
-                    .override(128, 128)
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .into(holder.avatar);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            holder.avatar.setTransitionName(itemList.get(position).username + "-avatar");
-            holder.background.setTransitionName(itemList.get(position).username + "-background");
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user, parent, false);
+            return new ViewHolder(v);
         }
     }
 
     @Override
-    public void onViewRecycled(ViewHolder holder) {
-        Glide.clear(holder.avatar);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof ViewHolder) {
+            ((ViewHolder) holder).onBindView(position);
+        }
     }
 
-    public void setActivity(Activity a) {
+    public void setActivity(MysplashActivity a) {
         this.a = a;
     }
 
@@ -133,6 +87,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         return position;
     }
 
+    @Override
+    public void onViewRecycled(RecyclerView.ViewHolder holder) {
+        super.onViewRecycled(holder);
+        if (holder instanceof ViewHolder) {
+            ((ViewHolder) holder).onRecycled();
+        }
+    }
+
     public void insertItem(User u, int position) {
         itemList.add(position, u);
         notifyItemInserted(position);
@@ -143,8 +105,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public int getRealItemCount() {
-        return itemList.size();
+    public void setUserData(List<User> list) {
+        itemList.clear();
+        itemList.addAll(list);
+        notifyDataSetChanged();
+    }
+
+    public List<User> getUserData() {
+        List<User> list = new ArrayList<>();
+        list.addAll(itemList);
+        return list;
     }
 
     /** <br> inner class. */
@@ -160,6 +130,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
         public TextView title;
         public TextView subtitle;
+
+        // life cycle.
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -178,22 +150,74 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             DisplayUtils.setTypeface(itemView.getContext(), subtitle);
         }
 
+        // UI.
+
+        void onBindView(final int position) {
+            title.setText(itemList.get(position).name);
+            if (TextUtils.isEmpty(itemList.get(position).bio)) {
+                subtitle.setText(
+                        itemList.get(position).total_photos + a.getResources().getStringArray(R.array.user_tabs)[0] +
+                                + itemList.get(position).total_collections + " " + a.getResources().getStringArray(R.array.user_tabs)[1] + ", "
+                                + itemList.get(position).total_likes + " " + a.getResources().getStringArray(R.array.user_tabs)[2]);
+            } else {
+                subtitle.setText(itemList.get(position).bio);
+            }
+
+            if (TextUtils.isEmpty(itemList.get(position).portfolio_url)) {
+                portfolioBtn.setVisibility(View.GONE);
+            } else {
+                portfolioBtn.setVisibility(View.VISIBLE);
+            }
+
+            if (Mysplash.getInstance().isLightTheme()) {
+                portfolioBtn.setImageResource(R.drawable.ic_item_earth_light);
+            } else {
+                portfolioBtn.setImageResource(R.drawable.ic_item_earth_dark);
+            }
+
+            ImageHelper.loadAvatar(a, avatar, itemList.get(position), new ImageHelper.OnLoadImageListener() {
+                @Override
+                public void onLoadSucceed() {
+                    if (!itemList.get(position).hasFadedIn) {
+                        itemList.get(position).hasFadedIn = true;
+                        ImageHelper.startSaturationAnimation(a, avatar);
+                    }
+                }
+
+                @Override
+                public void onLoadFailed() {
+                    // do nothing.
+                }
+            });
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                avatar.setTransitionName(itemList.get(position).username + "-avatar");
+                background.setTransitionName(itemList.get(position).username + "-background");
+            }
+        }
+
+        void onRecycled() {
+            ImageHelper.releaseImageView(avatar);
+        }
+
+        // interface.
+
         @Override
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.item_user_background:
-                    Activity activity = (Activity) a;
-                    View avatar = ((RelativeLayout) view).getChildAt(0);
-                    IntentHelper.startUserActivity(
-                            activity,
-                            avatar,
-                            itemList.get(getAdapterPosition()));
+                    if (a instanceof MysplashActivity) {
+                        IntentHelper.startUserActivity(
+                                (MysplashActivity) a,
+                                avatar,
+                                itemList.get(getAdapterPosition()),
+                                UserActivity.PAGE_PHOTO);
+                    }
                     break;
 
                 case R.id.item_user_portfolio:
                     if (!TextUtils.isEmpty(itemList.get(getAdapterPosition()).portfolio_url)) {
-                        Uri uri = Uri.parse(itemList.get(getAdapterPosition()).portfolio_url);
-                        a.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                        IntentHelper.startWebActivity(a, itemList.get(getAdapterPosition()).portfolio_url);
                     }
                     break;
             }

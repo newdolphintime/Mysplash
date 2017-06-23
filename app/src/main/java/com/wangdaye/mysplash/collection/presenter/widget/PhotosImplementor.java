@@ -11,9 +11,9 @@ import com.wangdaye.mysplash._common.data.service.PhotoService;
 import com.wangdaye.mysplash._common.i.model.PhotosModel;
 import com.wangdaye.mysplash._common.i.presenter.PhotosPresenter;
 import com.wangdaye.mysplash._common.i.view.PhotosView;
-import com.wangdaye.mysplash._common.ui._basic.MysplashActivity;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
-import com.wangdaye.mysplash._common.utils.NotificationUtils;
+import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
 import com.wangdaye.mysplash.collection.model.widget.PhotosObject;
 
 import java.util.List;
@@ -128,6 +128,11 @@ public class PhotosImplementor
     }
 
     @Override
+    public String getPhotosOrder() {
+        return model.getPhotosOrder();
+    }
+
+    @Override
     public void setOrder(String key) {
         model.setPhotosOrder(key);
     }
@@ -135,6 +140,22 @@ public class PhotosImplementor
     @Override
     public String getOrder() {
         return model.getPhotosOrder();
+    }
+
+    @Override
+    public void setPage(int page) {
+        model.setPhotosPage(page);
+    }
+
+    @Override
+    public void setPageList(List<Integer> pageList) {
+        model.setPageList(pageList);
+    }
+
+    @Override
+    public void setOver(boolean over) {
+        model.setOver(over);
+        view.setPermitLoading(!over);
     }
 
     @Override
@@ -200,9 +221,8 @@ public class PhotosImplementor
             model.setLoading(false);
             if (refresh) {
                 model.getAdapter().clearItem();
-                model.setOver(false);
+                setOver(false);
                 view.setRefreshing(false);
-                view.setPermitLoading(true);
             } else {
                 view.setLoading(false);
             }
@@ -212,13 +232,7 @@ public class PhotosImplementor
                     model.getAdapter().insertItem(response.body().get(i));
                 }
                 if (response.body().size() < Mysplash.DEFAULT_PER_PAGE) {
-                    model.setOver(true);
-                    view.setPermitLoading(false);
-                    if (response.body().size() == 0) {
-                        NotificationUtils.showSnackbar(
-                                c.getString(R.string.feedback_is_over),
-                                Snackbar.LENGTH_SHORT);
-                    }
+                    setOver(true);
                 }
                 view.requestPhotosSuccess();
             } else {
@@ -238,7 +252,7 @@ public class PhotosImplementor
             } else {
                 view.setLoading(false);
             }
-            NotificationUtils.showSnackbar(
+            NotificationHelper.showSnackbar(
                     c.getString(R.string.feedback_load_failed_toast) + " (" + t.getMessage() + ")",
                     Snackbar.LENGTH_SHORT);
             view.requestPhotosFailed(c.getString(R.string.feedback_load_failed_tv));

@@ -3,8 +3,8 @@ package com.wangdaye.mysplash._common.utils.helper;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-import com.wangdaye.mysplash._common.data.entity.database.DaoMaster;
-import com.wangdaye.mysplash._common.data.entity.database.DownloadMissionEntity;
+import com.wangdaye.mysplash._common.data.entity.table.DaoMaster;
+import com.wangdaye.mysplash._common.data.entity.table.DownloadMissionEntity;
 
 import java.util.List;
 
@@ -18,6 +18,21 @@ public class DatabaseHelper {
 
     // data
     private static final String BD_NAME = "Mysplash_db";
+
+    /** <br> singleton. */
+
+    private static DatabaseHelper instance;
+
+    public static DatabaseHelper getInstance(Context c) {
+        if (instance == null) {
+            synchronized (DatabaseHelper.class) {
+                if (instance == null) {
+                    instance = new DatabaseHelper(c);
+                }
+            }
+        }
+        return instance;
+    }
 
     /** <br> life cycle. */
 
@@ -39,8 +54,16 @@ public class DatabaseHelper {
         DownloadMissionEntity.clearDownloadEntity(openHelper.getWritableDatabase());
     }
 
-    public List<DownloadMissionEntity> readDownloadEntity() {
-        return DownloadMissionEntity.searchDownloadEntityList(openHelper.getReadableDatabase());
+    public void updateDownloadEntity(DownloadMissionEntity entity) {
+        DownloadMissionEntity.updateDownloadEntity(openHelper.getWritableDatabase(), entity);
+    }
+
+    public List<DownloadMissionEntity> readDownloadEntityList() {
+        return DownloadMissionEntity.readDownloadEntityList(openHelper.getReadableDatabase());
+    }
+
+    public List<DownloadMissionEntity> readDownloadEntityList(int result) {
+        return DownloadMissionEntity.readDownloadEntityList(openHelper.getReadableDatabase(), result);
     }
 
     @Nullable
@@ -48,22 +71,12 @@ public class DatabaseHelper {
         return DownloadMissionEntity.searchDownloadEntity(openHelper.getReadableDatabase(), missionId);
     }
 
-    public int readDownloadEntityCount(String title) {
-        return DownloadMissionEntity.searchDownloadEntityCount(openHelper.getReadableDatabase(), title);
+    @Nullable
+    public DownloadMissionEntity readDownloadingEntity(String title) {
+        return DownloadMissionEntity.searchDownloadingEntity(openHelper.getReadableDatabase(), title);
     }
 
-    /** <br> singleton. */
-
-    private static DatabaseHelper instance;
-
-    public static DatabaseHelper getInstance(Context c) {
-        if (instance == null) {
-            synchronized (DatabaseHelper.class) {
-                if (instance == null) {
-                    instance = new DatabaseHelper(c);
-                }
-            }
-        }
-        return instance;
+    public int readDownloadingEntityCount(String title) {
+        return DownloadMissionEntity.searchDownloadingEntityCount(openHelper.getReadableDatabase(), title);
     }
 }

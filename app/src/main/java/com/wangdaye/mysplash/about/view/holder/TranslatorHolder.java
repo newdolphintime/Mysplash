@@ -1,57 +1,82 @@
 package com.wangdaye.mysplash.about.view.holder;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wangdaye.mysplash.R;
+import com.wangdaye.mysplash._common.i.model.AboutModel;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
+import com.wangdaye.mysplash._common.ui.adapter.AboutAdapter;
 import com.wangdaye.mysplash._common.ui.widget.CircleImageView;
 import com.wangdaye.mysplash._common.utils.DisplayUtils;
+import com.wangdaye.mysplash._common.utils.helper.ImageHelper;
+import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
 import com.wangdaye.mysplash.about.model.TranslatorObject;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Translator holder.
  * */
 
-public class TranslatorHolder extends RecyclerView.ViewHolder
+public class TranslatorHolder extends AboutAdapter.ViewHolder
         implements View.OnClickListener {
     // widget
-    public CircleImageView avatar;
-    public ImageView flag;
+    private CircleImageView avatar;
+    private ImageView flag;
+    private TextView title;
+    private TextView subtitle;
 
     // data
-    private String email;
+    private String url;
 
     /** <br> life cycle. */
 
-    public TranslatorHolder(View itemView, TranslatorObject object) {
+    public TranslatorHolder(View itemView) {
         super(itemView);
 
         itemView.findViewById(R.id.item_about_translator_container).setOnClickListener(this);
 
         this.avatar = (CircleImageView) itemView.findViewById(R.id.item_about_translator_avatar);
-
-        TextView title = (TextView) itemView.findViewById(R.id.item_about_translator_title);
-        title.setText(object.title);
-
+        this.title = (TextView) itemView.findViewById(R.id.item_about_translator_title);
         this.flag = (ImageView) itemView.findViewById(R.id.item_about_translator_flag);
 
-        TextView subtitle = (TextView) itemView.findViewById(R.id.item_about_translator_subtitle);
-        subtitle.setText(object.subtitle);
+        this.subtitle = (TextView) itemView.findViewById(R.id.item_about_translator_subtitle);
         DisplayUtils.setTypeface(itemView.getContext(), subtitle);
+    }
 
-        this.email = object.subtitle;
+    /** <br> UI. */
+
+    @Override
+    protected void onBindView(MysplashActivity a, AboutModel model) {
+        TranslatorObject object = (TranslatorObject) model;
+
+        ImageHelper.loadAvatar(a, avatar, object.avatarUrl, null);
+        ImageHelper.loadIcon(a, flag, object.flagId);
+
+        title.setText(object.title);
+        subtitle.setText(object.subtitle);
+        url = object.subtitle;
+    }
+
+    @Override
+    protected void onRecycled() {
+        ImageHelper.releaseImageView(avatar);
+        ImageHelper.releaseImageView(flag);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.item_about_translator_container:
-                Uri email = Uri.parse("mailto:" + this.email);
-                v.getContext().startActivity(new Intent(Intent.ACTION_SENDTO, email));
+                String check = "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$";
+                Pattern regex = Pattern.compile(check);
+                Matcher matcher = regex.matcher(url);
+                IntentHelper.startWebActivity(
+                        v.getContext(),
+                        matcher.matches() ? "mailto:" + url : url);
                 break;
         }
     }

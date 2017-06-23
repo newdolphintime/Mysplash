@@ -1,40 +1,56 @@
 package com.wangdaye.mysplash.about.view.holder;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
+import com.wangdaye.mysplash._common.i.model.AboutModel;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.activity.IntroduceActivity;
+import com.wangdaye.mysplash._common.ui.adapter.AboutAdapter;
+import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
 import com.wangdaye.mysplash.about.model.AppAboutObject;
 
 /**
  * App holder.
  * */
 
-public class AppHolder extends RecyclerView.ViewHolder
+public class AppHolder extends AboutAdapter.ViewHolder
         implements View.OnClickListener {
+    // widget
+    private ImageView icon;
+    private TextView text;
+
     // data
     private int id;
 
     /** <br> life cycle. */
 
-    public AppHolder(View itemView, AppAboutObject object) {
+    public AppHolder(View itemView) {
         super(itemView);
 
         itemView.findViewById(R.id.item_about_app_container).setOnClickListener(this);
 
-        ImageView icon = (ImageView) itemView.findViewById(R.id.item_about_app_icon);
+        this.icon = (ImageView) itemView.findViewById(R.id.item_about_app_icon);
+        this.text = (TextView) itemView.findViewById(R.id.item_about_app_title);
+    }
+
+    /** <br> UI. */
+
+    @Override
+    public void onBindView(MysplashActivity a, AboutModel model) {
+        AppAboutObject object = (AppAboutObject) model;
+
         icon.setImageResource(object.iconId);
-
-        TextView text = (TextView) itemView.findViewById(R.id.item_about_app_title);
         text.setText(object.text);
+        id = object.id;
+    }
 
-        this.id = object.id;
+    @Override
+    protected void onRecycled() {
+        // do nothing.
     }
 
     /** <br> interface. */
@@ -49,18 +65,15 @@ public class AppHolder extends RecyclerView.ViewHolder
                         break;
 
                     case 2:
-                        Uri github = Uri.parse("https://github.com/WangDaYeeeeee");
-                        v.getContext().startActivity(new Intent(Intent.ACTION_VIEW, github));
+                        IntentHelper.startWebActivity(v.getContext(), "https://github.com/WangDaYeeeeee");
                         break;
 
                     case 3:
-                        Uri email = Uri.parse("mailto:wangdayeeeeee@gmail.com");
-                        v.getContext().startActivity(new Intent(Intent.ACTION_SENDTO, email));
+                        IntentHelper.startWebActivity(v.getContext(), "mailto:wangdayeeeeee@gmail.com");
                         break;
 
                     case 4:
-                        Uri mysplash = Uri.parse("https://github.com/WangDaYeeeeee/MySplash");
-                        v.getContext().startActivity(new Intent(Intent.ACTION_VIEW, mysplash));
+                        IntentHelper.startWebActivity(v.getContext(), "https://github.com/WangDaYeeeeee/MySplash");
                         break;
                 }
                 break;

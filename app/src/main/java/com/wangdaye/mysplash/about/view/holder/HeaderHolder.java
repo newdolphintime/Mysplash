@@ -1,6 +1,5 @@
 package com.wangdaye.mysplash.about.view.holder;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -8,17 +7,22 @@ import android.widget.TextView;
 
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
+import com.wangdaye.mysplash._common.i.model.AboutModel;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
+import com.wangdaye.mysplash._common.ui.adapter.AboutAdapter;
 import com.wangdaye.mysplash._common.ui.dialog.TotalDialog;
 import com.wangdaye.mysplash._common.ui.widget.SwipeBackCoordinatorLayout;
 import com.wangdaye.mysplash._common.utils.DisplayUtils;
+import com.wangdaye.mysplash._common.utils.helper.ImageHelper;
 
 /**
  * Header holder.
  * */
 
-public class HeaderHolder extends RecyclerView.ViewHolder
+public class HeaderHolder extends AboutAdapter.ViewHolder
         implements View.OnClickListener {
-    public ImageView appIcon;
+    // widget
+    private ImageView appIcon;
 
     /** <br> life cycle. */
 
@@ -47,6 +51,18 @@ public class HeaderHolder extends RecyclerView.ViewHolder
         TextView unsplashContent = (TextView) itemView.findViewById(R.id.item_about_header_unsplashContent);
         unsplashContent.setText(itemView.getContext().getString(R.string.about_unsplash));
         DisplayUtils.setTypeface(itemView.getContext(), unsplashContent);
+    }
+
+    /** <br> UI. */
+
+    @Override
+    protected void onBindView(MysplashActivity a, AboutModel model) {
+        ImageHelper.loadIcon(a, appIcon, R.drawable.ic_launcher);
+    }
+
+    @Override
+    protected void onRecycled() {
+        ImageHelper.releaseImageView(appIcon);
     }
 
     /** <br> interface. */

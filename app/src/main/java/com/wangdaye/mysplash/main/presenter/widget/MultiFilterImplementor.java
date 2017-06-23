@@ -11,7 +11,7 @@ import com.wangdaye.mysplash._common.data.service.PhotoService;
 import com.wangdaye.mysplash._common.i.model.MultiFilterModel;
 import com.wangdaye.mysplash._common.i.presenter.MultiFilterPresenter;
 import com.wangdaye.mysplash._common.i.view.MultiFilterView;
-import com.wangdaye.mysplash._common.ui._basic.MysplashActivity;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
 
 import java.util.List;
@@ -72,7 +72,6 @@ public class MultiFilterImplementor
         model.getService().cancel();
         model.setRefreshing(false);
         model.setLoading(false);
-        model.getAdapter().cancelService();
     }
 
     @Override
@@ -164,6 +163,12 @@ public class MultiFilterImplementor
     }
 
     @Override
+    public void setOver(boolean over) {
+        model.setOver(over);
+        view.setPermitLoading(!over);
+    }
+
+    @Override
     public int getAdapterItemCount() {
         return model.getAdapter().getRealItemCount();
     }
@@ -206,9 +211,8 @@ public class MultiFilterImplementor
             model.setLoading(false);
             if (refresh) {
                 model.getAdapter().clearItem();
-                model.setOver(false);
+                setOver(false);
                 view.setRefreshing(false);
-                view.setPermitLoading(true);
             } else {
                 view.setLoading(false);
             }
@@ -219,14 +223,7 @@ public class MultiFilterImplementor
                     model.getAdapter().insertItem(response.body().get(i));
                 }
                 if (response.body().size() < Mysplash.DEFAULT_PER_PAGE) {
-                    model.setOver(true);
-                    view.setPermitLoading(false);
-                    if (response.body().size() == 0) {
-                        Toast.makeText(
-                                c,
-                                c.getString(R.string.feedback_is_over) + "\n" + response.message(),
-                                Toast.LENGTH_SHORT).show();
-                    }
+                    setOver(true);
                 }
                 view.requestPhotosSuccess();
             } else {

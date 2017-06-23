@@ -3,13 +3,16 @@ package com.wangdaye.mysplash._common.utils.manager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 
 import com.wangdaye.mysplash.Mysplash;
+import com.wangdaye.mysplash.R;
 import com.wangdaye.mysplash._common.data.entity.unsplash.AccessToken;
 import com.wangdaye.mysplash._common.data.entity.unsplash.Me;
 import com.wangdaye.mysplash._common.data.entity.unsplash.User;
 import com.wangdaye.mysplash._common.data.service.UserService;
+import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,13 +58,22 @@ public class AuthManager
     public static final int LOADING_USER_STATE = 2;
 
     private static final String KEY_VERSION = "version";
-    private static final int VERSION_CODE = 4;
+    private static final int VERSION_CODE = 8;
 
-    private static final String KEY_BUILD_TYPE = "build_type";
-    private static final int BUILD_TYPE_BETA = 1;
-    private static final int BUILD_TYPE_RELEASE = 2;
-    private final int CORRECT_BUILD_TYPE = BUILD_TYPE_BETA;
-    // TODO: Need change APPLICATION_ID & SECRET when build type is change.
+    /** singleton. */
+
+    private static AuthManager instance;
+
+    public static AuthManager getInstance() {
+        if (instance == null) {
+            synchronized (AuthManager.class) {
+                if (instance == null) {
+                    instance = new AuthManager();
+                }
+            }
+        }
+        return instance;
+    }
 
     /** <br> life cycle. */
 
@@ -94,15 +106,12 @@ public class AuthManager
 
     private void updateVersion(SharedPreferences sharedPreferences) {
         int versionNow = sharedPreferences.getInt(KEY_VERSION, 0);
-        int buildTypeNow = sharedPreferences.getInt(KEY_BUILD_TYPE, BUILD_TYPE_RELEASE);
         String token = sharedPreferences.getString(KEY_ACCESS_TOKEN, null);
 
-        if ((versionNow < VERSION_CODE || buildTypeNow != CORRECT_BUILD_TYPE)
-                && !TextUtils.isEmpty(token)) {
+        if ((versionNow < VERSION_CODE) && !TextUtils.isEmpty(token)) {
 
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt(KEY_VERSION, VERSION_CODE);
-            editor.putInt(KEY_BUILD_TYPE, CORRECT_BUILD_TYPE);
             editor.putString(KEY_ACCESS_TOKEN, null);
             editor.putString(KEY_USERNAME, null);
             editor.putString(KEY_FIRST_NAME, null);
@@ -110,6 +119,10 @@ public class AuthManager
             editor.putString(KEY_EMAIL, null);
             editor.putString(KEY_AVATAR_PATH, null);
             editor.apply();
+
+            NotificationHelper.showSnackbar(
+                    Mysplash.getInstance().getString(R.string.feedback_please_login),
+                    Snackbar.LENGTH_SHORT);
         }
     }
 
@@ -267,20 +280,9 @@ public class AuthManager
         }
     }
 
-    /** singleton. */
-
-    private static AuthManager instance;
-
-    public static AuthManager getInstance() {
-        if (instance == null) {
-            instance = new AuthManager();
-        }
-        return instance;
-    }
-
     /** <br> interface. */
 
-    // on auth data changed listener.
+    // on auth data changed swipeListener.
 
     public interface OnAuthDataChangedListener {
         void onWriteAccessToken();
@@ -297,41 +299,45 @@ public class AuthManager
         listenerList.remove(l);
     }
 
-    // on request me profile listener.
+    // on request me profile swipeListener.
 
     @Override
     public void onRequestMeProfileSuccess(Call<Me> call, Response<Me> response) {
-        if (response.isSuccessful() && response.body() != null) {
+        if (response.isSuccessful() && response.body() != null && isAuthorized()) {
             state = LOADING_USER_STATE;
             writeUserInfo(response.body());
             service.requestUserProfile(response.body().username, this);
-        } else {
+        } else if (isAuthorized()) {
             service.requestMeProfile(this);
         }
     }
 
     @Override
     public void onRequestMeProfileFailed(Call<Me> call, Throwable t) {
-        service.requestMeProfile(this);
+        if (isAuthorized()) {
+            service.requestMeProfile(this);
+        }
     }
 
-    // on request user profile listener.
+    // on request user profile swipeListener.
 
     @Override
     public void onRequestUserProfileSuccess(Call<User> call, Response<User> response) {
-        if (response.isSuccessful() && response.body() != null) {
+        if (response.isSuccessful() && response.body() != null && isAuthorized()) {
             state = FREEDOM_STATE;
             writeUserInfo(response.body());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
                 ShortcutsManager.refreshShortcuts(Mysplash.getInstance());
             }
-        } else {
+        } else if (isAuthorized()) {
             service.requestUserProfile(me.username, this);
         }
     }
 
     @Override
     public void onRequestUserProfileFailed(Call<User> call, Throwable t) {
-        service.requestUserProfile(me.username, this);
+        if (isAuthorized()) {
+            service.requestUserProfile(me.username, this);
+        }
     }
 }

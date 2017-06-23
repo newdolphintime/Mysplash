@@ -17,9 +17,9 @@ import com.wangdaye.mysplash._common.data.entity.unsplash.ChangeCollectionPhotoR
 import com.wangdaye.mysplash._common.data.entity.unsplash.Collection;
 import com.wangdaye.mysplash._common.data.entity.unsplash.Photo;
 import com.wangdaye.mysplash._common.data.service.CollectionService;
-import com.wangdaye.mysplash._common.ui._basic.MysplashDialogFragment;
+import com.wangdaye.mysplash._common._basic.MysplashDialogFragment;
 import com.wangdaye.mysplash._common.utils.AnimUtils;
-import com.wangdaye.mysplash._common.utils.NotificationUtils;
+import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -113,7 +113,7 @@ public class DeleteCollectionPhotoDialogFragment extends MysplashDialogFragment
     }
 
     private void notifyFailed() {
-        NotificationUtils.showSnackbar(
+        NotificationHelper.showSnackbar(
                 getString(R.string.feedback_delete_photo_failed),
                 Snackbar.LENGTH_SHORT);
     }
@@ -133,7 +133,7 @@ public class DeleteCollectionPhotoDialogFragment extends MysplashDialogFragment
 
     /** <br> interface. */
 
-    // on delete collection listener.
+    // on delete collection swipeListener.
 
     public interface OnDeleteCollectionListener {
         void onDeletePhotoSuccess(ChangeCollectionPhotoResult result, int position);
@@ -143,7 +143,7 @@ public class DeleteCollectionPhotoDialogFragment extends MysplashDialogFragment
         listener = l;
     }
 
-    // on click listener.
+    // on click swipeListener.
 
     @Override
     public void onClick(View v) {
@@ -159,7 +159,7 @@ public class DeleteCollectionPhotoDialogFragment extends MysplashDialogFragment
         }
     }
 
-    // on change collection photo listener.
+    // on change collection photo swipeListener.
 
     @Override
     public void onChangePhotoSuccess(Call<ChangeCollectionPhotoResult> call,

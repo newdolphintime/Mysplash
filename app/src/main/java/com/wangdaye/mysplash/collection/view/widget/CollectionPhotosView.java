@@ -12,7 +12,6 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.wangdaye.mysplash.Mysplash;
@@ -22,12 +21,14 @@ import com.wangdaye.mysplash._common.data.entity.unsplash.User;
 import com.wangdaye.mysplash._common.i.model.ScrollModel;
 import com.wangdaye.mysplash._common.i.presenter.SwipeBackPresenter;
 import com.wangdaye.mysplash._common.i.view.SwipeBackView;
-import com.wangdaye.mysplash._common.ui._basic.MysplashActivity;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
 import com.wangdaye.mysplash._common.ui.dialog.SelectCollectionDialog;
 import com.wangdaye.mysplash._common.ui.widget.SwipeBackCoordinatorLayout;
+import com.wangdaye.mysplash._common.ui.widget.nestedScrollView.NestedScrollFrameLayout;
 import com.wangdaye.mysplash._common.utils.AnimUtils;
 import com.wangdaye.mysplash._common.utils.BackToTopUtils;
+import com.wangdaye.mysplash._common.utils.DisplayUtils;
 import com.wangdaye.mysplash._common.utils.manager.AuthManager;
 import com.wangdaye.mysplash.collection.model.widget.LoadObject;
 import com.wangdaye.mysplash.collection.model.widget.PhotosObject;
@@ -46,14 +47,16 @@ import com.wangdaye.mysplash._common.i.view.PhotosView;
 import com.wangdaye.mysplash._common.i.view.ScrollView;
 import com.wangdaye.mysplash._common.ui.widget.swipeRefreshView.BothWaySwipeRefreshLayout;
 import com.wangdaye.mysplash.collection.presenter.widget.SwipeBackImplementor;
+import com.wangdaye.mysplash.collection.view.activity.CollectionActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Collection photos view.
  * */
 
-public class CollectionPhotosView extends FrameLayout
+public class CollectionPhotosView extends NestedScrollFrameLayout
         implements PhotosView, LoadView, ScrollView, SwipeBackView,
         View.OnClickListener, BothWaySwipeRefreshLayout.OnRefreshAndLoadListener,
         SelectCollectionDialog.OnCollectionsChangedListener {
@@ -100,7 +103,7 @@ public class CollectionPhotosView extends FrameLayout
 
     @SuppressLint("InflateParams")
     private void initialize() {
-        View loadingView = LayoutInflater.from(getContext()).inflate(R.layout.container_loading_view_mini, null);
+        View loadingView = LayoutInflater.from(getContext()).inflate(R.layout.container_loading_view_mini, this, false);
         addView(loadingView);
 
         View contentView = LayoutInflater.from(getContext()).inflate(R.layout.container_photo_list, null);
@@ -109,10 +112,16 @@ public class CollectionPhotosView extends FrameLayout
         initView();
     }
 
-    public void initMP(MysplashActivity a, Collection c) {
+    @Override
+    public boolean isParentOffset() {
+        return false;
+    }
+
+    public void initMP(CollectionActivity a, Collection c) {
         initModel(a, c);
         initPresenter();
-        recyclerView.setAdapter(photosModel.getAdapter());
+        recyclerView.setAdapter(photosPresenter.getAdapter());
+        photosPresenter.getAdapter().setRecyclerView(recyclerView);
     }
 
     /** <br> presenter. */
@@ -146,6 +155,11 @@ public class CollectionPhotosView extends FrameLayout
             refreshLayout.setProgressBackgroundColorSchemeResource(R.color.colorPrimary_dark);
         }
 
+        int navigationBarHeight = DisplayUtils.getNavigationBarHeight(getResources());
+        refreshLayout.setDragTriggerDistance(
+                BothWaySwipeRefreshLayout.DIRECTION_BOTTOM,
+                (int) (navigationBarHeight + new DisplayUtils(getContext()).dpToPx(16)));
+
         this.recyclerView = (RecyclerView) findViewById(R.id.container_photo_list_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.addOnScrollListener(onScrollListener);
@@ -165,13 +179,17 @@ public class CollectionPhotosView extends FrameLayout
         scrollPresenter.scrollToTop();
     }
 
+    public void initAnimShow() {
+        AnimUtils.animInitShow(progressView, 400);
+    }
+
     /** <br> model. */
 
     // init.
 
-    private void initModel(MysplashActivity a, Collection c) {
+    private void initModel(CollectionActivity a, Collection c) {
         PhotoAdapter adapter = new PhotoAdapter(
-                a, new ArrayList<Photo>(Mysplash.DEFAULT_PER_PAGE), this);
+                a, new ArrayList<Photo>(Mysplash.DEFAULT_PER_PAGE), this, a);
         adapter.setInMyCollection(
                 AuthManager.getInstance().getUsername() != null
                         && AuthManager.getInstance().getUsername().equals(c.user.username));
@@ -188,6 +206,22 @@ public class CollectionPhotosView extends FrameLayout
 
     public void setActivity(MysplashActivity a) {
         photosPresenter.setActivityForAdapter(a);
+    }
+
+    public List<Photo> getPhotos() {
+        return photosPresenter.getAdapter().getPhotoData();
+    }
+
+    public void setPhotos(List<Photo> list) {
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        photosPresenter.getAdapter().setPhotoData(list);
+        if (list.size() == 0) {
+            initRefresh();
+        } else {
+            setNormalState();
+        }
     }
 
     public void initRefresh() {
@@ -212,7 +246,7 @@ public class CollectionPhotosView extends FrameLayout
 
     /** <br> interface. */
 
-    // on click listener.
+    // on click swipeListener.
 
     @Override
     public void onClick(View view) {
@@ -223,7 +257,7 @@ public class CollectionPhotosView extends FrameLayout
         }
     }
 
-    // on refresh and load listener.
+    // on refresh and load swipeListener.
 
     @Override
     public void onRefresh() {
@@ -235,7 +269,7 @@ public class CollectionPhotosView extends FrameLayout
         photosPresenter.loadMore(getContext(), false);
     }
 
-    // on scroll listener.
+    // on scroll swipeListener.
 
     private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
@@ -245,7 +279,7 @@ public class CollectionPhotosView extends FrameLayout
         }
     };
 
-    // on collections change listener.
+    // on collections change swipeListener.
 
     @Override
     public void onAddCollection(Collection c) {
@@ -351,7 +385,7 @@ public class CollectionPhotosView extends FrameLayout
     @Override
     public void autoLoad(int dy) {
         int lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
-        int totalItemCount = recyclerView.getAdapter().getItemCount();
+        int totalItemCount = photosPresenter.getAdapter().getRealItemCount();
         if (photosPresenter.canLoadMore()
                 && lastVisibleItem >= totalItemCount - 10 && totalItemCount > 0 && dy > 0) {
             photosPresenter.loadMore(getContext(), false);

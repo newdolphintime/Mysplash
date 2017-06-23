@@ -3,7 +3,7 @@ package com.wangdaye.mysplash._common.utils;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.design.widget.AppBarLayout;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,6 +15,8 @@ import android.view.animation.Transformation;
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
 import com.wangdaye.mysplash._common.ui.activity.SettingsActivity;
+import com.wangdaye.mysplash._common.ui.widget.nestedScrollView.NestedScrollAppBarLayout;
+import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
 
 /**
  * Back to top utils.
@@ -37,10 +39,8 @@ public class BackToTopUtils {
     private static void showSetBackToTopSnackbar() {
         if (!Mysplash.getInstance().isNotifiedSetBackToTop()) {
             final Context c = Mysplash.getInstance().getTopActivity();
-            SharedPreferences.Editor editor = Mysplash.getInstance()
-                    .getSharedPreferences(
-                            Mysplash.PREFERENCE_BACK_TO_TOP,
-                            Mysplash.MODE_PRIVATE)
+            SharedPreferences.Editor editor = PreferenceManager
+                    .getDefaultSharedPreferences(Mysplash.getInstance())
                     .edit();
             editor.putBoolean(
                     c.getString(R.string.key_notified_set_back_to_top),
@@ -49,7 +49,7 @@ public class BackToTopUtils {
 
             Mysplash.getInstance().setNotifiedSetBackToTop();
 
-            NotificationUtils.showActionSnackbar(
+            NotificationHelper.showActionSnackbar(
                     c.getString(R.string.feedback_notify_set_back_to_top),
                     c.getString(R.string.set),
                     Snackbar.LENGTH_LONG,
@@ -76,7 +76,7 @@ public class BackToTopUtils {
         }
     }
 
-    public static void showTopBar(AppBarLayout topBar, View contentView) {
+    public static void showTopBar(NestedScrollAppBarLayout topBar, View contentView) {
         if (topBar.getY() < 0) {
             ShowTopBarAnim topBarAnim = new ShowTopBarAnim(topBar);
             topBarAnim.setDuration(300);
@@ -143,11 +143,11 @@ public class BackToTopUtils {
 
     private static class ShowTopBarListener implements Animation.AnimationListener {
         // widget
-        private AppBarLayout topBar;
+        private NestedScrollAppBarLayout topBar;
 
         // life cycle.
 
-        ShowTopBarListener(AppBarLayout bar) {
+        ShowTopBarListener(NestedScrollAppBarLayout bar) {
             topBar = bar;
         }
 
@@ -161,7 +161,7 @@ public class BackToTopUtils {
         @Override
         public void onAnimationEnd(Animation animation) {
             CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) topBar.getLayoutParams();
-            params.setBehavior(new AppBarLayout.Behavior());
+            params.setBehavior(new NestedScrollAppBarLayout.Behavior());
             topBar.setLayoutParams(params);
         }
 

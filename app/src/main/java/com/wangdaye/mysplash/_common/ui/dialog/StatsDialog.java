@@ -17,7 +17,7 @@ import com.wangdaye.mysplash.R;
 import com.wangdaye.mysplash._common.data.entity.unsplash.Photo;
 import com.wangdaye.mysplash._common.data.entity.unsplash.PhotoStats;
 import com.wangdaye.mysplash._common.data.service.PhotoService;
-import com.wangdaye.mysplash._common.ui._basic.MysplashDialogFragment;
+import com.wangdaye.mysplash._common._basic.MysplashDialogFragment;
 import com.wangdaye.mysplash._common.utils.AnimUtils;
 import com.wangdaye.mysplash._common.utils.DisplayUtils;
 
@@ -100,14 +100,14 @@ public class StatsDialog extends MysplashDialogFragment
             ((ImageView) v.findViewById(R.id.dialog_stats_downloadIcon))
                     .setImageResource(R.drawable.ic_download_light);
             ((ImageView) v.findViewById(R.id.dialog_stats_likeIcon))
-                    .setImageResource(R.drawable.ic_heart_outline_light);
+                    .setImageResource(R.drawable.ic_heart_light);
             ((ImageView) v.findViewById(R.id.dialog_stats_viewIcon))
                     .setImageResource(R.drawable.ic_eye_light);
         } else {
             ((ImageView) v.findViewById(R.id.dialog_stats_downloadIcon))
                     .setImageResource(R.drawable.ic_download_dark);
             ((ImageView) v.findViewById(R.id.dialog_stats_likeIcon))
-                    .setImageResource(R.drawable.ic_heart_outline_dark);
+                    .setImageResource(R.drawable.ic_heart_dark);
             ((ImageView) v.findViewById(R.id.dialog_stats_viewIcon))
                     .setImageResource(R.drawable.ic_eye_dark);
         }
@@ -133,7 +133,7 @@ public class StatsDialog extends MysplashDialogFragment
 
     /** <br> interface. */
 
-    // on request stats listener.
+    // on request stats swipeListener.
 
     @SuppressLint("SetTextI18n")
     @Override

@@ -36,7 +36,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_scrollFlags="scroll|snap">
+                    app:layout_scrollFlags="scroll">
 
                     <android.support.v7.widget.Toolbar
                         android:id="@+id/activity_user_toolbar"
@@ -54,8 +54,9 @@
                         android:scaleType="centerCrop"
                         android:src="?attr/line_color"
                         android:transitionName="@string/transition_user_avatar"
-                        app:civ_fill_color="@color/colorTextGrey"
-                        tools:ignore="RtlHardcoded" />
+                        android:foreground="?attr/selectableItemBackground"
+                        android:stateListAnimator="@animator/touch_rise"
+                        tools:ignore="ContentDescription,RtlHardcoded" />
 
                     <TextView
                         android:id="@+id/activity_user_title"
@@ -67,6 +68,7 @@
                         android:layout_marginLeft="@dimen/normal_margin"
                         android:layout_marginRight="@dimen/normal_margin"
                         android:layout_centerHorizontal="true"
+                        android:foreground="?attr/selectableItemBackground"
                         style="@style/title_text"
                         tools:text="Alfredo Wong"
                         tools:ignore="RtlHardcoded" />
@@ -83,10 +85,7 @@
                     android:id="@+id/activity_user_tabLayout"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/tab_layout_height"
-                    app:tabIndicatorHeight="3dp"
-                    app:tabIndicatorColor="?attr/title_color"
-                    app:tabSelectedTextColor="?attr/content_color"
-                    app:tabTextColor="?attr/subtitle_color" />
+                    style="@style/MysplashTabLayoutTheme" />
 
             </com.wangdaye.mysplash._common.ui.widget.nestedScrollView.NestedScrollAppBarLayout>
 

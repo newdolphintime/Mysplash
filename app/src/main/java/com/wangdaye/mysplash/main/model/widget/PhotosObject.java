@@ -1,11 +1,10 @@
 package com.wangdaye.mysplash.main.model.widget;
 
-import android.app.Activity;
-
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
 import com.wangdaye.mysplash._common.data.service.PhotoService;
 import com.wangdaye.mysplash._common.i.model.PhotosModel;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
 
 import java.util.ArrayList;
@@ -27,6 +26,7 @@ public class PhotosObject
     private int photosPage;
     private List<Integer> pageList;
 
+    private boolean refreshing;
     private boolean loading;
     private boolean over;
 
@@ -36,17 +36,18 @@ public class PhotosObject
 
     /** <br> life cycle. */
 
-    public PhotosObject(Activity a, PhotoAdapter adapter, int photosType, String order) {
+    public PhotosObject(MysplashActivity a, PhotoAdapter adapter, int photosType) {
         this.adapter = adapter;
         this.service = PhotoService.getService();
 
         this.photosType = photosType;
-        this.photosOrder = order;
+        this.photosOrder = Mysplash.getInstance().getDefaultPhotoOrder();
         RANDOM_TXT = a.getResources().getStringArray(R.array.photo_order_values)[3];
 
         this.photosPage = adapter.getRealItemCount() / Mysplash.DEFAULT_PER_PAGE;
         this.pageList = new ArrayList<>();
 
+        this.refreshing = false;
         this.loading = false;
         this.over = false;
     }
@@ -110,17 +111,17 @@ public class PhotosObject
 
     @Override
     public void setPageList(List<Integer> list) {
-        pageList = list;
+        pageList.addAll(list);
     }
 
     @Override
     public boolean isRefreshing() {
-        return false;
+        return refreshing;
     }
 
     @Override
     public void setRefreshing(boolean refreshing) {
-
+        this.refreshing = refreshing;
     }
 
     @Override

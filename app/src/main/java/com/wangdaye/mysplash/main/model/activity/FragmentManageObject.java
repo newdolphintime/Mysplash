@@ -1,10 +1,10 @@
 package com.wangdaye.mysplash.main.model.activity;
 
-import com.wangdaye.mysplash._common.i.model.FragmentManageModel;
-import com.wangdaye.mysplash._common.ui.fragment.MysplashFragment;
+import android.content.Intent;
+import android.text.TextUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.wangdaye.mysplash.R;
+import com.wangdaye.mysplash._common.i.model.FragmentManageModel;
 
 /**
  * Fragment mange object.
@@ -13,47 +13,30 @@ import java.util.List;
 public class FragmentManageObject
         implements FragmentManageModel {
     // data
-    private List<MysplashFragment> fragmentList;
-    private List<Integer> idList;
+    private int id;
 
     /** <br> life cycle. */
 
-    public FragmentManageObject() {
-        this.fragmentList = new ArrayList<>();
-        this.idList = new ArrayList<>();
+    public FragmentManageObject(int id, Intent intent) {
+        this.id = id;
+        if (this.id == 0) {
+            this.id = R.id.action_home;
+            if (intent != null && !TextUtils.isEmpty(intent.getAction())
+                    && intent.getAction().equals("com.wangdaye.mysplash.Search")) {
+                this.id = R.id.action_search;
+            }
+        }
     }
 
     /** <br> model. */
 
     @Override
-    public List<MysplashFragment> getFragmentList() {
-        return fragmentList;
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
-    public List<Integer> getIdList() {
-        return idList;
-    }
-
-    @Override
-    public MysplashFragment getFragmentFromList(int position) {
-        return fragmentList.get(position);
-    }
-
-    @Override
-    public int getFragmentCount() {
-        return fragmentList.size();
-    }
-
-    @Override
-    public void addFragmentToList(MysplashFragment f, int id) {
-        fragmentList.add(f);
-        idList.add(id);
-    }
-
-    @Override
-    public void popFragmentFromList() {
-        fragmentList.remove(fragmentList.size() - 1);
-        idList.remove(idList.size() - 1);
+    public int getId() {
+        return id;
     }
 }

@@ -3,8 +3,8 @@ package com.wangdaye.mysplash.main.view.widget;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
@@ -14,12 +14,10 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
@@ -32,14 +30,16 @@ import com.wangdaye.mysplash._common.i.model.ScrollModel;
 import com.wangdaye.mysplash._common.i.presenter.CategoryPresenter;
 import com.wangdaye.mysplash._common.i.presenter.LoadPresenter;
 import com.wangdaye.mysplash._common.i.presenter.ScrollPresenter;
-import com.wangdaye.mysplash._common.ui._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
 import com.wangdaye.mysplash._common.ui.dialog.SelectCollectionDialog;
+import com.wangdaye.mysplash._common.ui.widget.nestedScrollView.NestedScrollFrameLayout;
 import com.wangdaye.mysplash._common.utils.AnimUtils;
 import com.wangdaye.mysplash._common.utils.BackToTopUtils;
 import com.wangdaye.mysplash._common.i.view.CategoryView;
 import com.wangdaye.mysplash._common.i.view.LoadView;
 import com.wangdaye.mysplash._common.i.view.ScrollView;
+import com.wangdaye.mysplash._common.utils.DisplayUtils;
+import com.wangdaye.mysplash._common.utils.helper.ImageHelper;
 import com.wangdaye.mysplash.main.model.widget.CategoryObject;
 import com.wangdaye.mysplash._common.ui.widget.swipeRefreshView.BothWaySwipeRefreshLayout;
 import com.wangdaye.mysplash.main.model.widget.LoadObject;
@@ -47,14 +47,16 @@ import com.wangdaye.mysplash.main.model.widget.ScrollObject;
 import com.wangdaye.mysplash.main.presenter.widget.CategoryImplementor;
 import com.wangdaye.mysplash.main.presenter.widget.LoadImplementor;
 import com.wangdaye.mysplash.main.presenter.widget.ScrollImplementor;
+import com.wangdaye.mysplash.main.view.activity.MainActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Category photos view.
  * */
 
-public class CategoryPhotosView extends FrameLayout
+public class CategoryPhotosView extends NestedScrollFrameLayout
         implements CategoryView, LoadView, ScrollView,
         View.OnClickListener, BothWaySwipeRefreshLayout.OnRefreshAndLoadListener,
         SelectCollectionDialog.OnCollectionsChangedListener {
@@ -75,9 +77,6 @@ public class CategoryPhotosView extends FrameLayout
     private CategoryPresenter categoryPresenter;
     private LoadPresenter loadPresenter;
     private ScrollPresenter scrollPresenter;
-
-    // data
-    private final String KEY_CATEGORY_PHOTOS_VIEW_FILTER_TYPE = "category_photos_view_filter_type";
 
     /** <br> life cycle. */
 
@@ -104,7 +103,7 @@ public class CategoryPhotosView extends FrameLayout
 
     @SuppressLint("InflateParams")
     private void initialize() {
-        View searchingView = LayoutInflater.from(getContext()).inflate(R.layout.container_loading_in_category_view_large, null);
+        View searchingView = LayoutInflater.from(getContext()).inflate(R.layout.container_loading_in_category_view_large, this, false);
         addView(searchingView);
 
         View contentView = LayoutInflater.from(getContext()).inflate(R.layout.container_photo_list, null);
@@ -115,17 +114,26 @@ public class CategoryPhotosView extends FrameLayout
         initView();
     }
 
-    public void readBundle(@NonNull Bundle saveInstanceState) {
-        categoryPresenter.setOrder(saveInstanceState.getString(
-                KEY_CATEGORY_PHOTOS_VIEW_FILTER_TYPE,
-                categoryPresenter.getOrder()));
-        initRefresh();
+    @Override
+    public Parcelable onSaveInstanceState() {
+        return new SavedState(this, super.onSaveInstanceState());
     }
 
-    public void writeBundle(Bundle outState) {
-        outState.putString(
-                KEY_CATEGORY_PHOTOS_VIEW_FILTER_TYPE,
-                categoryPresenter.getOrder());
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        SavedState ss = (SavedState) state;
+        super.onRestoreInstanceState(ss.getSuperState());
+
+        categoryPresenter.setCategory(ss.category);
+        categoryPresenter.setOrder(ss.order);
+        categoryPresenter.setPage(ss.page);
+        categoryPresenter.setPageList(ss.pageList);
+        categoryPresenter.setOver(ss.over);
+    }
+
+    @Override
+    public boolean isParentOffset() {
+        return false;
     }
 
     /** <br> presenter. */
@@ -157,10 +165,17 @@ public class CategoryPhotosView extends FrameLayout
             refreshLayout.setProgressBackgroundColorSchemeResource(R.color.colorPrimary_dark);
         }
 
+        int navigationBarHeight = DisplayUtils.getNavigationBarHeight(getResources());
+        refreshLayout.setDragTriggerDistance(
+                BothWaySwipeRefreshLayout.DIRECTION_BOTTOM,
+                (int) (navigationBarHeight + new DisplayUtils(getContext()).dpToPx(16)));
+
         this.recyclerView = (RecyclerView) findViewById(R.id.container_photo_list_recyclerView);
-        recyclerView.setAdapter(categoryModel.getAdapter());
+        recyclerView.setAdapter(categoryPresenter.getAdapter());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.addOnScrollListener(scrollListener);
+
+        categoryPresenter.getAdapter().setRecyclerView(recyclerView);
     }
 
     private void initLoadingView() {
@@ -171,10 +186,7 @@ public class CategoryPhotosView extends FrameLayout
         feedbackContainer.setVisibility(GONE);
 
         ImageView feedbackImg = (ImageView) findViewById(R.id.container_loading_in_category_view_large_feedbackImg);
-        Glide.with(getContext())
-                .load(R.drawable.feedback_no_photos)
-                .dontAnimate()
-                .into(feedbackImg);
+        ImageHelper.loadIcon(getContext(), feedbackImg, R.drawable.feedback_no_photos);
 
         this.feedbackText = (TextView) findViewById(R.id.container_loading_in_category_view_large_feedbackTxt);
 
@@ -198,15 +210,33 @@ public class CategoryPhotosView extends FrameLayout
                 new PhotoAdapter(
                         getContext(),
                         new ArrayList<Photo>(Mysplash.DEFAULT_PER_PAGE),
-                        this));
+                        this,
+                        null));
         this.loadModel = new LoadObject(LoadObject.LOADING_STATE);
         this.scrollModel = new ScrollObject(true);
     }
 
     // interface.
 
-    public void setActivity(MysplashActivity a) {
+    public void setActivity(MainActivity a) {
         categoryPresenter.setActivityForAdapter(a);
+        categoryPresenter.getAdapter().setOnDownloadPhotoListener(a);
+    }
+
+    public List<Photo> getPhotos() {
+        return categoryPresenter.getAdapter().getPhotoData();
+    }
+
+    public void setPhotos(List<Photo> list) {
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        categoryPresenter.getAdapter().setPhotoData(list);
+        if (list.size() == 0) {
+            initRefresh();
+        } else {
+            setNormalState();
+        }
     }
 
     public void setCategory(int id) {
@@ -235,7 +265,7 @@ public class CategoryPhotosView extends FrameLayout
 
     /** <br> interface. */
 
-    // on click listener.
+    // on click swipeListener.
 
     @Override
     public void onClick(View view) {
@@ -246,7 +276,7 @@ public class CategoryPhotosView extends FrameLayout
         }
     }
 
-    // on refresh an load listener.
+    // on refresh an load swipeListener.
 
     @Override
     public void onRefresh() {
@@ -258,7 +288,7 @@ public class CategoryPhotosView extends FrameLayout
         categoryPresenter.loadMore(getContext(), false);
     }
 
-    // on scroll listener.
+    // on scroll swipeListener.
 
     private RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
 
@@ -269,7 +299,7 @@ public class CategoryPhotosView extends FrameLayout
         }
     };
 
-    // on collections changed listener.
+    // on collections changed swipeListener.
 
     @Override
     public void onAddCollection(Collection c) {
@@ -367,7 +397,7 @@ public class CategoryPhotosView extends FrameLayout
     @Override
     public void autoLoad(int dy) {
         int lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
-        int totalItemCount = recyclerView.getAdapter().getItemCount();
+        int totalItemCount = categoryPresenter.getAdapter().getRealItemCount();
         if (categoryPresenter.canLoadMore()
                 && lastVisibleItem >= totalItemCount - 10 && totalItemCount > 0 && dy > 0) {
             categoryPresenter.loadMore(getContext(), false);
@@ -386,5 +416,77 @@ public class CategoryPhotosView extends FrameLayout
     public boolean needBackToTop() {
         return !scrollPresenter.isToTop()
                 && loadPresenter.getLoadState() == LoadObject.NORMAL_STATE;
+    }
+
+    /** <br> inner class. */
+
+    private static class SavedState extends BaseSavedState {
+        // data
+        int category;
+        String order;
+
+        int page;
+        List<Integer> pageList;
+
+        boolean over;
+
+        // life cycle.
+
+        SavedState(CategoryPhotosView view, Parcelable superState) {
+            super(superState);
+            this.category = view.categoryModel.getPhotosCategory();
+            this.order = view.categoryModel.getPhotosOrder();
+            this.page = view.categoryModel.getPhotosPage();
+            this.pageList = new ArrayList<>();
+            this.pageList.addAll(view.categoryModel.getPageList());
+            this.over = view.categoryModel.isOver();
+        }
+
+        private SavedState(Parcel in) {
+            super(in);
+            this.category = in.readInt();
+            this.order = in.readString();
+            this.page = in.readInt();
+
+            this.pageList = new ArrayList<>();
+            int[] pages = new int[in.readInt()];
+            in.readIntArray(pages);
+            pageList = new ArrayList<>(pages.length);
+            for (int p : pages) {
+                pageList.add(p);
+            }
+
+            this.over = in.readByte() != 0;
+        }
+
+        // interface.
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeInt(this.category);
+            out.writeString(this.order);
+            out.writeInt(this.page);
+
+            int[] pages = new int[pageList.size()];
+            for (int i = 0; i < pages.length; i ++) {
+                pages[i] = pageList.get(i);
+            }
+            out.writeInt(pages.length);
+            out.writeIntArray(pages);
+
+            out.writeByte(this.over ? (byte) 1 : (byte) 0);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR
+                = new Parcelable.Creator<SavedState>() {
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
     }
 }

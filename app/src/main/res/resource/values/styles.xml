@@ -40,45 +40,75 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-    <!-- photo activity. -->
-
-    <style name="MysplashTheme_light.Translucent.Photo" parent="MysplashTheme_light.Translucent">
-        <item name="android:windowTranslucentStatus">true</item>
+    <style
+        name="MysplashTheme_light.Translucent.TranslucentNavigation"
+        parent="MysplashTheme_light.Translucent">
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
-    <style name="MysplashTheme_dark.Translucent.Photo" parent="MysplashTheme_dark.Translucent">
-        <item name="android:windowTranslucentStatus">true</item>
+    <style
+        name="MysplashTheme_dark.Translucent.TranslucentNavigation"
+        parent="MysplashTheme_dark.Translucent">
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
-    <!-- photo preview activity. -->
+    <!-- main activity. -->
 
-    <style name="MysplashTheme_light.Translucent.PhotoPreview" parent="MysplashTheme_light.Translucent">
+    <style name="MysplashTheme_light.Main" parent="MysplashTheme_light">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
-    <style name="MysplashTheme_dark.Translucent.PhotoPreview" parent="MysplashTheme_dark.Translucent">
+    <style name="MysplashTheme_dark.Main" parent="MysplashTheme_dark">
         <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <!-- photo activity. -->
+
+    <style name="MysplashTheme_light.Translucent.Photo" parent="MysplashTheme_light.Translucent" />
+
+    <style name="MysplashTheme_dark.Translucent.Photo" parent="MysplashTheme_dark.Translucent" />
+
+    <!-- preview activity. -->
+
+    <style name="MysplashTheme_light.Translucent.Preview" parent="MysplashTheme_light.Translucent">
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <style name="MysplashTheme_dark.Translucent.Preview" parent="MysplashTheme_dark.Translucent">
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
     <!-- user activity. -->
 
-    <style name="MysplashTheme_light.Translucent.User" parent="MysplashTheme_light.Translucent" />
+    <style
+        name="MysplashTheme_light.Translucent.User"
+        parent="MysplashTheme_light.Translucent.TranslucentNavigation" />
 
-    <style name="MysplashTheme_dark.Translucent.User" parent="MysplashTheme_dark.Translucent" />
+    <style
+        name="MysplashTheme_dark.Translucent.User"
+        parent="MysplashTheme_dark.Translucent.TranslucentNavigation" />
 
     <!-- me activity. -->
 
-    <style name="MysplashTheme_light.Translucent.Me" parent="MysplashTheme_light.Translucent" />
+    <style
+        name="MysplashTheme_light.Translucent.Me"
+        parent="MysplashTheme_light.Translucent.TranslucentNavigation" />
 
-    <style name="MysplashTheme_dark.Translucent.Me" parent="MysplashTheme_dark.Translucent" />
+    <style
+        name="MysplashTheme_dark.Translucent.Me"
+        parent="MysplashTheme_dark.Translucent.TranslucentNavigation" />
 
     <!-- collection activity. -->
 
-    <style name="MysplashTheme_light.Translucent.Collection" parent="MysplashTheme_light.Translucent" />
+    <style
+        name="MysplashTheme_light.Translucent.Collection"
+        parent="MysplashTheme_light.Translucent.TranslucentNavigation" />
 
-    <style name="MysplashTheme_dark.Translucent.Collection" parent="MysplashTheme_dark.Translucent" />
+    <style
+        name="MysplashTheme_dark.Translucent.Collection"
+        parent="MysplashTheme_dark.Translucent.TranslucentNavigation" />
 
     <!-- settings activity. -->
 
@@ -96,11 +126,27 @@
 
     <style name="MysplashTheme_dark.Translucent.Common" parent="MysplashTheme_dark.Translucent" />
 
+    <!-- set wallpaper activity. -->
+
+    <style name="MysplashTheme_dark.SetWallpaper" parent="MysplashTheme_dark">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
     <!-- toolbar. -->
 
     <style name="MysplashToolbarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
         <item name="android:textColorPrimary">?attr/content_color</item>
         <item name="android:textColorSecondary">?attr/content_color</item>
+    </style>
+
+    <!-- tab layout. -->
+
+    <style name="MysplashTabLayoutTheme" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorHeight">3dp</item>
+        <item name="tabIndicatorColor">?attr/title_color</item>
+        <item name="tabSelectedTextColor">?android:textColorPrimary</item>
+        <item name="tabTextColor">?attr/subtitle_color</item>
     </style>
 
     <!-- menu. -->
@@ -174,18 +220,20 @@
 
     <!-- dialog. -->
     <style name="MysplashDialogTheme_light" parent="@android:style/Theme.Holo.Light.Dialog">
-        <item name="android:textColorPrimary">@color/colorTextTitle_light</item>
-        <item name="android:textColorAlertDialogListItem">@color/colorTextContent_light</item>
-        <item name="android:textColorSecondary">@color/colorTextContent_light</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColorPrimary">@color/colorTextSubtitle_light</item>
+        <item name="android:textColorAlertDialogListItem">@color/colorTextTitle_light</item>
+        <item name="android:textColorSecondary">@color/colorTextTitle_light</item>
         <item name="colorAccent">@color/colorTextTitle_light</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <style name="MysplashDialogTheme_dark" parent="@android:style/Theme.Holo.Dialog">
-        <item name="android:textColorPrimary">@color/colorTextTitle_dark</item>
-        <item name="android:textColorAlertDialogListItem">@color/colorTextContent_dark</item>
-        <item name="android:textColorSecondary">@color/colorTextContent_dark</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColorPrimary">@color/colorTextSubtitle_dark</item>
+        <item name="android:textColorAlertDialogListItem">@color/colorTextTitle_dark</item>
+        <item name="android:textColorSecondary">@color/colorTextTitle_dark</item>
         <item name="colorAccent">@color/colorTextTitle_dark</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>

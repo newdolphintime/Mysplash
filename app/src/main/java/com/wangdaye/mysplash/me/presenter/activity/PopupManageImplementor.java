@@ -1,8 +1,6 @@
 package com.wangdaye.mysplash.me.presenter.activity;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.View;
@@ -11,11 +9,12 @@ import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
 import com.wangdaye.mysplash._common.i.presenter.PopupManagePresenter;
 import com.wangdaye.mysplash._common.i.view.PopupManageView;
-import com.wangdaye.mysplash._common.ui._basic.MysplashActivity;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.popup.MeMenuPopupWindow;
 import com.wangdaye.mysplash._common.ui.popup.PhotoOrderPopupWindow;
-import com.wangdaye.mysplash._common.utils.NotificationUtils;
+import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
 import com.wangdaye.mysplash._common.utils.ShareUtils;
+import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
 import com.wangdaye.mysplash._common.utils.manager.AuthManager;
 
 /**
@@ -54,7 +53,7 @@ public class PopupManageImplementor
                 }
             });
         } else {
-            NotificationUtils.showSnackbar(
+            NotificationHelper.showSnackbar(
                     c.getString(R.string.feedback_no_filter),
                     Snackbar.LENGTH_SHORT);
         }
@@ -62,15 +61,14 @@ public class PopupManageImplementor
 
     /** <br> interface. */
 
-    // on select item listener.
+    // on select item swipeListener.
 
     @Override
     public void onSelectItem(int id) {
         MysplashActivity a = Mysplash.getInstance().getTopActivity();
         switch (id) {
             case MeMenuPopupWindow.ITEM_SUBMIT:
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://unsplash.com/submit"));
-                a.startActivity(intent);
+                IntentHelper.startWebActivity(a, Mysplash.UNSPLASH_SUBMIT_URL);
                 break;
 
             case MeMenuPopupWindow.ITEM_PORTFOLIO:
@@ -78,10 +76,9 @@ public class PopupManageImplementor
                         && AuthManager.getInstance().getMe() != null) {
                     String url = AuthManager.getInstance().getMe().portfolio_url;
                     if (!TextUtils.isEmpty(url)) {
-                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                        a.startActivity(i);
+                        IntentHelper.startWebActivity(a, url);
                     } else {
-                        NotificationUtils.showSnackbar(
+                        NotificationHelper.showSnackbar(
                                 a.getString(R.string.feedback_portfolio_is_null),
                                 Snackbar.LENGTH_SHORT);
                     }

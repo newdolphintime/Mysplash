@@ -9,8 +9,13 @@
         android:duration="350"
         tools:ignore="NewApi">
         <targets>
+            <target android:targetId="@id/activity_collection_avatar" />
             <target android:targetId="@id/activity_collection_swipeBackView" />
         </targets>
     </changeBounds>
+
+    <pathMotion
+        class="com.wangdaye.mysplash._common.ui.transition.GravityArcMotion"
+        android:maximumAngle="50" />
 
 </transitionSet>

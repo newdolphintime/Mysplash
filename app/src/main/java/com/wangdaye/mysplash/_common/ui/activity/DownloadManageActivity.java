@@ -1,10 +1,15 @@
 package com.wangdaye.mysplash._common.ui.activity;
 
-import android.content.Intent;
-import android.database.Cursor;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.os.SystemClock;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -14,23 +19,22 @@ import android.view.View;
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
 import com.wangdaye.mysplash._common.data.entity.item.DownloadMission;
-import com.wangdaye.mysplash._common.ui._basic.MysplashActivity;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.dialog.PathDialog;
 import com.wangdaye.mysplash._common.ui.widget.SwipeBackCoordinatorLayout;
 import com.wangdaye.mysplash._common.utils.DisplayUtils;
+import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
+import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
 import com.wangdaye.mysplash._common.utils.helper.DownloadHelper;
-import com.wangdaye.mysplash._common.data.entity.database.DownloadMissionEntity;
+import com.wangdaye.mysplash._common.data.entity.table.DownloadMissionEntity;
 import com.wangdaye.mysplash._common.ui.adapter.DownloadAdapter;
 import com.wangdaye.mysplash._common.ui.widget.coordinatorView.StatusBarView;
 import com.wangdaye.mysplash._common.utils.manager.ThreadManager;
-import com.wangdaye.mysplash._common.utils.widget.FlagRunnable;
 import com.wangdaye.mysplash._common.utils.widget.SafeHandler;
-import com.wangdaye.mysplash.main.view.activity.MainActivity;
+import com.wangdaye.mysplash._common._basic.FlagRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Download manage activity.
@@ -38,10 +42,10 @@ import java.util.TimerTask;
 
 public class DownloadManageActivity extends MysplashActivity
         implements View.OnClickListener, Toolbar.OnMenuItemClickListener,
-        SwipeBackCoordinatorLayout.OnSwipeListener, SafeHandler.HandlerContainer {
+        DownloadAdapter.OnRetryListener, SwipeBackCoordinatorLayout.OnSwipeListener,
+        SafeHandler.HandlerContainer {
     // widget
     private SafeHandler<DownloadManageActivity> handler;
-    private Timer timer;
 
     private CoordinatorLayout container;
     private StatusBarView statusBar;
@@ -49,13 +53,10 @@ public class DownloadManageActivity extends MysplashActivity
 
     // data
     private DownloadAdapter adapter;
+    private DownloadMissionEntity readyToDownloadEntity;
     public static final String EXTRA_NOTIFICATION = "notification";
 
-    private final int CHECK_START = 0;
     private final int CHECK_AND_UPDATE = 1;
-    private final int CHECK_FINISH = -1;
-
-    private final String KEY_DOWNLOAD_MANAGE_ACTIVITY_MISSION_ID = "download_manage_activity_mission_id";
 
     /** <br> life cycle. */
 
@@ -72,14 +73,8 @@ public class DownloadManageActivity extends MysplashActivity
             setStarted();
             initData();
             initWidget();
-        } else {
-            this.adapter = new DownloadAdapter(this);
-            recyclerView.setAdapter(adapter);
+            ThreadManager.getInstance().execute(checkRunnable);
         }
-
-        this.timer = new Timer();
-        this.handler = new SafeHandler<>(this);
-        handler.obtainMessage(CHECK_START).sendToTarget();
     }
 
     @Override
@@ -88,9 +83,8 @@ public class DownloadManageActivity extends MysplashActivity
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        timer.cancel();
+    protected void onDestroy() {
+        super.onDestroy();
         handler.removeCallbacksAndMessages(null);
     }
 
@@ -109,7 +103,7 @@ public class DownloadManageActivity extends MysplashActivity
     }
 
     @Override
-    protected boolean needSetStatusBarTextDark() {
+    protected boolean isFullScreen() {
         return true;
     }
 
@@ -137,6 +131,8 @@ public class DownloadManageActivity extends MysplashActivity
     // init.
 
     private void initWidget() {
+        this.handler = new SafeHandler<>(this);
+
         this.container = (CoordinatorLayout) findViewById(R.id.activity_download_manage_container);
 
         SwipeBackCoordinatorLayout swipeBackView
@@ -177,60 +173,137 @@ public class DownloadManageActivity extends MysplashActivity
 
     // interface.
 
-    private void makeRecyclerItemDrawProcess(int position, DownloadMission mission, Cursor cursor) {
+    private void drawRecyclerItemProcess(int position, DownloadMission mission, boolean switchState) {
+        adapter.itemList.set(position, mission);
+
         LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         int firstPosition = layoutManager.findFirstVisibleItemPosition();
         int lastPosition = layoutManager.findLastVisibleItemPosition();
         if (firstPosition <= position && position <= lastPosition) {
             DownloadAdapter.ViewHolder holder
                     = (DownloadAdapter.ViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
-            if (cursor != null) {
-                holder.drawProcessStatus(mission.entity, cursor);
-            } else {
-                holder.drawProcessStatus(mission.entity);
+            if (holder != null) {
+                holder.drawProcessStatus(mission, switchState);
             }
         }
     }
 
-    private void makeRecyclerItemDrawSuccess(int position) {
+    private void drawRecyclerItemSucceed(int position, DownloadMission mission) {
         adapter.itemList.remove(position);
         adapter.notifyItemRemoved(position);
+
+        for (int i = adapter.itemList.size() - 1; i >= 0; i --) {
+            if (adapter.itemList.get(i).entity.result != DownloadHelper.RESULT_SUCCEED) {
+                adapter.itemList.add(i + 1, mission);
+                adapter.notifyItemInserted(i + 1);
+                return;
+            }
+        }
+        adapter.itemList.add(0, mission);
+        adapter.notifyItemInserted(0);
     }
 
-    private void makeRecyclerItemDrawFailed(int position) {
-        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-        int firstPosition = layoutManager.findFirstVisibleItemPosition();
-        int lastPosition = layoutManager.findLastVisibleItemPosition();
-        if (firstPosition <= position && position <= lastPosition) {
-            DownloadAdapter.ViewHolder holder
-                    = (DownloadAdapter.ViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
-            holder.drawFailedStatus();
+    private void drawRecyclerItemFailed(int position, DownloadMission mission) {
+        adapter.itemList.remove(position);
+        adapter.notifyItemRemoved(position);
+
+        adapter.itemList.add(0, mission);
+        adapter.notifyItemInserted(0);
+    }
+
+    private void restartMission() {
+        if (readyToDownloadEntity == null) {
+            return;
+        }
+
+        long oldId = readyToDownloadEntity.missionId;
+        readyToDownloadEntity = null;
+
+        DownloadMission mission = DownloadHelper.getInstance(this).restartMission(this, oldId);
+
+        for (int i = 0; i < adapter.itemList.size(); i ++) {
+            if (adapter.itemList.get(i).entity.missionId == oldId) {
+                adapter.itemList.remove(i);
+                adapter.notifyItemRemoved(i);
+                break;
+            }
+        }
+        if (adapter.itemList.size() > 0) {
+            for (int i = 0; i < adapter.itemList.size(); i ++) {
+                if (adapter.itemList.get(i).entity.result != DownloadHelper.RESULT_FAILED) {
+                    adapter.itemList.add(i, mission);
+                    adapter.notifyItemInserted(i);
+                    return;
+                }
+            }
+            adapter.itemList.add(adapter.itemList.size(), mission);
+            adapter.notifyItemInserted(adapter.itemList.size() - 1);
+        } else {
+            adapter.itemList.add(0, mission);
+            adapter.notifyItemInserted(0);
         }
     }
 
     /** <br> data. */
 
     private void initData() {
-        this.adapter = new DownloadAdapter(this);
+        this.adapter = new DownloadAdapter(this, this);
+    }
+
+    /** <br> permission. */
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void requestPermission(int permissionCode, int type) {
+        switch (permissionCode) {
+            case Mysplash.WRITE_EXTERNAL_STORAGE:
+                if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    this.requestPermissions(
+                            new String[] {
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            type);
+                } else {
+                    restartMission();
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permission, @NonNull int[] grantResult) {
+        super.onRequestPermissionsResult(requestCode, permission, grantResult);
+        for (int i = 0; i < permission.length; i ++) {
+            switch (permission[i]) {
+                case Manifest.permission.WRITE_EXTERNAL_STORAGE:
+                    if (grantResult[i] == PackageManager.PERMISSION_GRANTED) {
+                        restartMission();
+                    } else {
+                        NotificationHelper.showSnackbar(
+                                getString(R.string.feedback_need_permission),
+                                Snackbar.LENGTH_SHORT);
+                    }
+                    break;
+            }
+        }
     }
 
     /** <br> interface. */
 
-    // on click listener.
+    // on click swipeListener.
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case -1:
                 if (getIntent().getBooleanExtra(EXTRA_NOTIFICATION, false)) {
-                    startActivity(new Intent(this, MainActivity.class));
+                    IntentHelper.startMainActivity(this);
                 }
                 finishActivity(SwipeBackCoordinatorLayout.DOWN_DIR);
                 break;
         }
     }
 
-    // on menu item click listener.
+    // on menu item click swipeListener.
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
@@ -242,7 +315,7 @@ public class DownloadManageActivity extends MysplashActivity
 
             case R.id.action_cancel_all:
                 List<DownloadMissionEntity> entityList = new ArrayList<>();
-                for (int i = 0; i < adapter.getRealItemCount(); i ++) {
+                for (int i = 0; i < adapter.getItemCount(); i ++) {
                     entityList.add(adapter.itemList.get(i).entity);
                 }
                 DownloadHelper.getInstance(this).clearMission(this, entityList);
@@ -253,7 +326,19 @@ public class DownloadManageActivity extends MysplashActivity
         return true;
     }
 
-    // on swipe listener.
+    // on retry swipeListener.
+
+    @Override
+    public void onRetry(DownloadMissionEntity entity) {
+        readyToDownloadEntity = entity;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            restartMission();
+        } else {
+            requestPermission(Mysplash.WRITE_EXTERNAL_STORAGE, 0);
+        }
+    }
+
+    // on swipe swipeListener.
 
     @Override
     public boolean canSwipeBack(int dir) {
@@ -276,57 +361,55 @@ public class DownloadManageActivity extends MysplashActivity
     @Override
     public void handleMessage(Message message) {
         switch (message.what) {
-            case CHECK_START:
-                ThreadManager.getInstance().execute(checkRunnable);
-                break;
-
-            case CHECK_FINISH:
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        handler.obtainMessage(CHECK_START).sendToTarget();
-                    }
-                }, 500);
-                break;
-
             case CHECK_AND_UPDATE:
-                long id = message.getData().getLong(KEY_DOWNLOAD_MANAGE_ACTIVITY_MISSION_ID, -1);
-                if (id == -1) {
-                    break;
-                }
-                int index = -1;
-                for (int i = 0; i < adapter.getRealItemCount(); i ++) {
-                    if (adapter.itemList.get(i).entity.missionId == id) {
-                        index = i;
-                        break;
-                    }
-                }
-                if (index == -1) {
-                    break;
-                }
-                Cursor cursor = message.obj == null ? null : (Cursor) message.obj;
-                if (cursor != null) {
-                    if (DownloadHelper.isMissionFailed(cursor)) {
-                        if (adapter.itemList.get(index).process != -1) {
-                            adapter.itemList.get(index).process = -1;
-                            makeRecyclerItemDrawFailed(index);
-                        }
-                    } else if (DownloadHelper.isMissionSuccess(cursor)) {
-                        if (adapter.itemList.get(index).process != 100) {
-                            adapter.itemList.get(index).process = 100;
-                            makeRecyclerItemDrawSuccess(index);
-                        }
-                    } else {
-                        float percent = DownloadHelper.getMissionProcess(cursor);
-                        if (adapter.itemList.get(index).process != percent) {
-                            adapter.itemList.get(index).process = percent;
-                            makeRecyclerItemDrawProcess(index, adapter.itemList.get(index), cursor);
+                if (message.obj != null && message.obj instanceof DownloadMission) {
+                    DownloadMission newMission = (DownloadMission) message.obj;
+                    int index = -1;
+                    for (int i = 0; i < adapter.getItemCount(); i ++) {
+                        if (adapter.itemList.get(i).entity.missionId == newMission.entity.missionId) {
+                            index = i;
+                            break;
                         }
                     }
-                } else {
-                    if (adapter.itemList.get(index).process != 0) {
-                        adapter.itemList.get(index).process = 0;
-                        makeRecyclerItemDrawProcess(index, adapter.itemList.get(index), null);
+                    if (index == -1) {
+                        return;
+                    }
+                    DownloadMission oldMission = adapter.itemList.get(index);
+                    switch (newMission.entity.result) {
+                        case DownloadHelper.RESULT_DOWNLOADING:
+                            if (oldMission.entity.result != DownloadHelper.RESULT_DOWNLOADING) {
+                                DownloadHelper.getInstance(this)
+                                        .updateMissionResult(
+                                                this,
+                                                newMission.entity.missionId,
+                                                DownloadHelper.RESULT_DOWNLOADING);
+                                drawRecyclerItemProcess(index, newMission, true);
+                            } else if (oldMission.process != newMission.process) {
+                                drawRecyclerItemProcess(index, newMission, false);
+                            }
+                            break;
+
+                        case DownloadHelper.RESULT_SUCCEED:
+                            if (oldMission.entity.result != DownloadHelper.RESULT_SUCCEED) {
+                                DownloadHelper.getInstance(this)
+                                        .updateMissionResult(
+                                                this,
+                                                newMission.entity.missionId,
+                                                DownloadHelper.RESULT_SUCCEED);
+                                drawRecyclerItemSucceed(index, newMission);
+                            }
+                            break;
+
+                        case DownloadHelper.RESULT_FAILED:
+                            if (oldMission.entity.result != DownloadHelper.RESULT_FAILED) {
+                                DownloadHelper.getInstance(this)
+                                        .updateMissionResult(
+                                                this,
+                                                newMission.entity.missionId,
+                                                DownloadHelper.RESULT_FAILED);
+                                drawRecyclerItemFailed(index, newMission);
+                            }
+                            break;
                     }
                 }
                 break;
@@ -338,28 +421,23 @@ public class DownloadManageActivity extends MysplashActivity
     private FlagRunnable checkRunnable = new FlagRunnable(true) {
         @Override
         public void run() {
-            Cursor cursor;
-            long missionIds[] = new long[adapter.getRealItemCount()];
-            for (int i = 0; i < adapter.getItemCount(); i ++) {
-                missionIds[i] = adapter.itemList.get(i).entity.missionId;
-            }
-            for (long id : missionIds) {
-                if (!checkRunnable.isRunning()) {
-                    break;
+            while (isRunning()) {
+                for (int i = 0; isRunning() && i < adapter.itemList.size(); i ++) {
+                    if (adapter.itemList.get(i).entity.result == DownloadHelper.RESULT_DOWNLOADING) {
+                        DownloadMission mission = DownloadHelper.getInstance(DownloadManageActivity.this)
+                                .getDownloadMission(
+                                        DownloadManageActivity.this,
+                                        adapter.itemList.get(i).entity.missionId);
+                        if (mission != null
+                                && (mission.entity.result == DownloadHelper.RESULT_DOWNLOADING
+                                || mission.entity.result != adapter.itemList.get(i).entity.result)) {
+                            handler.obtainMessage(CHECK_AND_UPDATE, mission).sendToTarget();
+                        }
+                        SystemClock.sleep(50);
+                    }
                 }
-                cursor = DownloadHelper.getInstance(DownloadManageActivity.this).getMissionCursor(id);
-                Bundle bundle = new Bundle();
-                bundle.putLong(KEY_DOWNLOAD_MANAGE_ACTIVITY_MISSION_ID, id);
-
-                Message msg = new Message();
-                msg.what = CHECK_AND_UPDATE;
-                msg.obj = cursor;
-                msg.setData(bundle);
-
-                msg.setTarget(handler);
-                msg.sendToTarget();
+                SystemClock.sleep(50);
             }
-            handler.obtainMessage(CHECK_FINISH).sendToTarget();
         }
     };
 }

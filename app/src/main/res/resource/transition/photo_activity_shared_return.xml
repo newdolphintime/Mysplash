@@ -22,4 +22,8 @@
         </targets>
     </changeBounds>
 
+    <pathMotion
+        class="com.wangdaye.mysplash._common.ui.transition.GravityArcMotion"
+        android:maximumAngle="50" />
+
 </transitionSet>

@@ -13,13 +13,17 @@
         </targets>
     </changeBounds>
 
-    <changeBounds
+    <transition
+        class="com.wangdaye.mysplash._common.ui.transition.CoverTransition"
         android:interpolator="@android:interpolator/fast_out_slow_in"
-        android:duration="350"
         tools:ignore="NewApi">
         <targets>
             <target android:targetId="@id/activity_photo_image" />
         </targets>
-    </changeBounds>
+    </transition>
+
+    <pathMotion
+        class="com.wangdaye.mysplash._common.ui.transition.GravityArcMotion"
+        android:maximumAngle="50" />
 
 </transitionSet>

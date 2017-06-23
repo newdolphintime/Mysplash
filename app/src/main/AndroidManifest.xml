@@ -15,7 +15,7 @@
 
         <activity
             android:name=".main.view.activity.MainActivity"
-            android:theme="@style/MysplashTheme_light"
+            android:theme="@style/MysplashTheme_light.Main"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,8 +52,8 @@
         </activity>
 
         <activity
-            android:name="._common.ui.activity.PreviewPhotoActivity"
-            android:theme="@style/MysplashTheme_light.Translucent.PhotoPreview"
+            android:name="._common.ui.activity.PreviewActivity"
+            android:theme="@style/MysplashTheme_light.Translucent.TranslucentNavigation"
             android:label="@string/app_name" />
 
         <activity
@@ -110,6 +110,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".me.view.activity.MyFollowActivity"
+            android:theme="@style/MysplashTheme_light.Translucent.Common"
+            android:label="@string/app_name" />
+
         <activity android:name="._common.ui.activity.UpdateMeActivity"
             android:theme="@style/MysplashTheme_light.Translucent.Common"
             android:label="@string/app_name" />
@@ -139,6 +144,30 @@
             android:theme="@style/MysplashTheme_light.Translucent.Common"
             android:label="@string/app_name" />
 
+        <activity android:name=".tag.view.activity.TagActivity"
+            android:theme="@style/MysplashTheme_light.Translucent.TranslucentNavigation"
+            android:label="@string/app_name" />
+
+        <activity android:name="._common.ui.activity.CustomApiActivity"
+            android:theme="@style/MysplashTheme_light.Translucent.Common"
+            android:label="@string/app_name" />
+
+        <activity android:name="._common.ui.activity.RelativeActivity"
+            android:theme="@style/MysplashTheme_light.Translucent.Common"
+            android:label="@string/app_name" />
+
+        <activity android:name="._common.ui.activity.SetWallpaperActivity"
+            android:theme="@style/MysplashTheme_dark.SetWallpaper"
+            android:label="@string/app_name">
+            <intent-filter>
+                <data android:mimeType="image/*" />
+                <action android:name="android.intent.action.ATTACH_DATA" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- receiver. -->
+
         <receiver
             android:name="._common.receiver.DownloadReceiver">
             <intent-filter android:priority="1000">
@@ -154,5 +183,7 @@
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
 
 </manifest>

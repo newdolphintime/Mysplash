@@ -11,9 +11,9 @@ import com.wangdaye.mysplash._common.data.service.CollectionService;
 import com.wangdaye.mysplash._common.i.model.CollectionsModel;
 import com.wangdaye.mysplash._common.i.presenter.CollectionsPresenter;
 import com.wangdaye.mysplash._common.i.view.CollectionsView;
-import com.wangdaye.mysplash._common.ui._basic.MysplashActivity;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.adapter.CollectionAdapter;
-import com.wangdaye.mysplash._common.utils.NotificationUtils;
+import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
 
 import java.util.List;
 
@@ -130,6 +130,17 @@ public class CollectionsImplementor
     }
 
     @Override
+    public void setPage(int page) {
+        model.setCollectionsPage(page);
+    }
+
+    @Override
+    public void setOver(boolean over) {
+        model.setOver(over);
+        view.setPermitLoading(!over);
+    }
+
+    @Override
     public void setActivityForAdapter(MysplashActivity a) {
         model.getAdapter().setActivity(a);
     }
@@ -168,25 +179,18 @@ public class CollectionsImplementor
             model.setLoading(false);
             if (refresh) {
                 model.getAdapter().clearItem();
-                model.setOver(false);
+                setOver(false);
                 view.setRefreshing(false);
-                view.setPermitLoading(true);
             } else {
                 view.setLoading(false);
             }
             if (response.isSuccessful()) {
                 model.setCollectionsPage(page);
                 for (int i = 0; i < response.body().size(); i ++) {
-                    model.getAdapter().insertItem(response.body().get(i), 0);
+                    model.getAdapter().insertItem(response.body().get(i), model.getAdapter().getRealItemCount());
                 }
                 if (response.body().size() < Mysplash.DEFAULT_PER_PAGE) {
-                    model.setOver(true);
-                    view.setPermitLoading(false);
-                    if (response.body().size() == 0) {
-                        NotificationUtils.showSnackbar(
-                                c.getString(R.string.feedback_is_over),
-                                Snackbar.LENGTH_SHORT);
-                    }
+                    setOver(true);
                 }
                 view.requestCollectionsSuccess();
             } else {
@@ -206,7 +210,7 @@ public class CollectionsImplementor
             } else {
                 view.setLoading(false);
             }
-            NotificationUtils.showSnackbar(
+            NotificationHelper.showSnackbar(
                     c.getString(R.string.feedback_load_failed_toast) + " (" + t.getMessage() + ")",
                     Snackbar.LENGTH_SHORT);
             view.requestCollectionsFailed(c.getString(R.string.feedback_load_failed_tv));

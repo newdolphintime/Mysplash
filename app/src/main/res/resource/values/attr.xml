@@ -32,14 +32,31 @@
 
     <!-- FreedomImageView -->
     <declare-styleable name="FreedomImageView">
+        <attr name="fiv_not_free" format="boolean" />
         <attr name="fiv_cover_mode" format="boolean" />
-        <attr name="fiv_text_position" format="string" />
-        <attr name="fiv_square" format="boolean" />
+        <attr name="fiv_shadow_position">
+            <enum name="top" value="1" />
+            <enum name="bottom" value="-1" />
+            <enum name="both" value="2" />
+            <enum name="none" value="0" />
+        </attr>
     </declare-styleable>
 
     <!-- SwipeBackCoordinatorLayout -->
     <declare-styleable name="SwipeBackCoordinatorLayout">
         <attr name="sbl_force_back" format="boolean" />
+    </declare-styleable>
+
+    <!-- RippleButton -->
+    <declare-styleable name="RippleButton">
+        <attr name="rb_title_on" format="string" />
+        <attr name="rb_title_off" format="string" />
+    </declare-styleable>
+
+    <!-- LiftOff -->
+    <declare-styleable name="LiftOff">
+        <attr name="initElevation" format="dimension" />
+        <attr name="finalElevation" format="dimension" />
     </declare-styleable>
 
 </resources>

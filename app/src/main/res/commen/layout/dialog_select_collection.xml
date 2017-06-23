@@ -18,7 +18,7 @@
             android:layout_centerInParent="true"
             android:layout_margin="24dp"
             app:cpv_animAutostart="true"
-            app:cpv_color="?attr/content_color"
+            app:cpv_color="?attr/title_color"
             app:cpv_indeterminate="true" />
 
         <LinearLayout
@@ -29,8 +29,10 @@
             android:background="?attr/root_color">
 
             <RelativeLayout
+                android:id="@+id/dialog_select_collection_titleBar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="?attr/root_color">
 
                 <TextView
                     android:text="@string/feedback_add_to_collection"
@@ -52,12 +54,19 @@
 
             </RelativeLayout>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/dialog_select_collection_selectorRecyclerView"
+            <com.wangdaye.mysplash._common.ui.widget.swipeRefreshView.BothWaySwipeRefreshLayout
+                android:id="@+id/dialog_select_collection_selectorRefreshView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingTop="@dimen/little_margin"
-                android:clipToPadding="false" />
+                android:layout_height="match_parent">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/dialog_select_collection_selectorRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="@dimen/little_margin"
+                    android:clipToPadding="false" />
+
+            </com.wangdaye.mysplash._common.ui.widget.swipeRefreshView.BothWaySwipeRefreshLayout>
 
         </LinearLayout>
 

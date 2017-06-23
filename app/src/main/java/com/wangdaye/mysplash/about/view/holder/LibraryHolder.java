@@ -1,40 +1,57 @@
 package com.wangdaye.mysplash.about.view.holder;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
 import com.wangdaye.mysplash.R;
+import com.wangdaye.mysplash._common.i.model.AboutModel;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
+import com.wangdaye.mysplash._common.ui.adapter.AboutAdapter;
 import com.wangdaye.mysplash._common.utils.DisplayUtils;
+import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
 import com.wangdaye.mysplash.about.model.LibraryObject;
 
 /**
  * Library holder.
  * */
 
-public class LibraryHolder extends RecyclerView.ViewHolder
+public class LibraryHolder extends AboutAdapter.ViewHolder
         implements View.OnClickListener {
+    // widget
+    private TextView title;
+    private TextView content;
+
     // data
     private String uri;
 
     /** <br> life cycle. */
 
-    public LibraryHolder(View itemView, LibraryObject object) {
+    public LibraryHolder(View itemView) {
         super(itemView);
 
         itemView.findViewById(R.id.item_about_library_container).setOnClickListener(this);
 
-        TextView title = (TextView) itemView.findViewById(R.id.item_about_library_title);
-        title.setText(object.title);
+        this.title = (TextView) itemView.findViewById(R.id.item_about_library_title);
         DisplayUtils.setTypeface(itemView.getContext(), title);
 
-        TextView content = (TextView) itemView.findViewById(R.id.item_about_library_content);
-        content.setText(object.subtitle);
+        this.content = (TextView) itemView.findViewById(R.id.item_about_library_content);
         DisplayUtils.setTypeface(itemView.getContext(), content);
+    }
 
-        this.uri = object.uri;
+    /** <br> UI. */
+
+    @Override
+    protected void onBindView(MysplashActivity a, AboutModel model) {
+        LibraryObject object = (LibraryObject) model;
+
+        title.setText(object.title);
+        content.setText(object.subtitle);
+        uri = object.uri;
+    }
+
+    @Override
+    protected void onRecycled() {
+        // do nothing.
     }
 
     /** <br> interface. */
@@ -43,8 +60,7 @@ public class LibraryHolder extends RecyclerView.ViewHolder
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.item_about_library_container:
-                Uri uri = Uri.parse(this.uri);
-                v.getContext().startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                IntentHelper.startWebActivity(v.getContext(), uri);
                 break;
         }
     }

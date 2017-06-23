@@ -19,8 +19,14 @@
     <!-- user tab. -->
     <string-array name="user_tabs">
         <item>PHOTOS</item>
-        <item>COLLECTIONS</item>
         <item>LIKES</item>
+        <item>COLLECTIONS</item>
+    </string-array>
+
+    <!-- my follow tab. -->
+    <string-array name="my_follow_tabs">
+        <item>FOLLOWERS</item>
+        <item>FOLLOWING</item>
     </string-array>
 
     <!-- download option. -->
@@ -80,16 +86,24 @@
 
     <!-- language. -->
     <string-array name="languages">
-        <item>Follow system</item>
+        <item>@string/follow_system</item>
         <item>English</item>
         <item>中文</item>
         <item>Italiano</item>
+        <item>Türk</item>
+        <item>Deutsche</item>
+        <item>Русский</item>
+        <item>Español</item>
     </string-array>
     <string-array name="language_values">
         <item>follow_system</item>
         <item>english</item>
         <item>chinese</item>
         <item>italian</item>
+        <item>turkish</item>
+        <item>german</item>
+        <item>russian</item>
+        <item>spanish</item>
     </string-array>
 
     <!-- search orientation. -->
@@ -104,13 +118,16 @@
         <item>square</item>
     </string-array>
 
-    <!-- explore. -->
-<!--    <string-array name="explore">
+    <!-- explore. --><!--
+    <string-array name="explore_items">
+        <item>buildings</item>
         <item>nature</item>
+        <item>object</item>
+        <item>people</item>
+        <item>technology</item>
         <item>computer</item>
         <item>girl</item>
         <item>food</item>
-        <item>people</item>
         <item>work</item>
         <item>office</item>
         <item>music</item>
@@ -154,6 +171,6 @@
         <item>restaurant</item>
         <item>sky</item>
         <item>watch</item>
-    </string-array>
--->
+    </string-array>-->
+
 </resources>

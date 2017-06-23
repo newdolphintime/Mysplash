@@ -2,7 +2,7 @@ package com.wangdaye.mysplash._common.i.presenter;
 
 import android.content.Context;
 
-import com.wangdaye.mysplash._common.ui._basic.MysplashActivity;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.adapter.PhotoAdapter;
 
 /**
@@ -36,6 +36,8 @@ public interface MultiFilterPresenter {
 
     void setFeatured(boolean f);
     boolean isFeatured();
+
+    void setOver(boolean over);
 
     int getAdapterItemCount();
     void setActivityForAdapter(MysplashActivity a);

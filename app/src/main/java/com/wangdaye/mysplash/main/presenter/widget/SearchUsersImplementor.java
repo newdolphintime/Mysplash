@@ -115,6 +115,17 @@ public class SearchUsersImplementor
     }
 
     @Override
+    public void setPage(int page) {
+        model.setPhotosPage(page);
+    }
+
+    @Override
+    public void setOver(boolean over) {
+        model.setOver(over);
+        view.setPermitLoading(!over);
+    }
+
+    @Override
     public int getAdapterItemCount() {
         return ((UserAdapter) model.getAdapter()).getRealItemCount();
     }
@@ -156,31 +167,23 @@ public class SearchUsersImplementor
             model.setLoading(false);
             if (refresh) {
                 adapter.clearItem();
-                model.setOver(false);
+                setOver(false);
                 view.setRefreshing(false);
-                view.setPermitLoading(true);
             } else {
                 view.setLoading(false);
             }
             if (response.isSuccessful()
                     && response.body() != null
                     && response.body().results != null
-                    && adapter.getRealItemCount() + response.body().results.size() > 0) {
+                    && adapter.getItemCount() + response.body().results.size() > 0) {
                 model.setPhotosPage(page);
                 for (int i = 0; i < response.body().results.size(); i ++) {
                     adapter.insertItem(
                             response.body().results.get(i),
-                            adapter.getRealItemCount());
+                            adapter.getItemCount());
                 }
                 if (response.body().results.size() < Mysplash.DEFAULT_PER_PAGE) {
-                    model.setOver(true);
-                    view.setPermitLoading(false);
-                    if (response.body().results.size() == 0) {
-                        Toast.makeText(
-                                c,
-                                c.getString(R.string.feedback_is_over) + "\n" + response.message(),
-                                Toast.LENGTH_SHORT).show();
-                    }
+                    setOver(true);
                 }
                 view.requestPhotosSuccess();
             } else {

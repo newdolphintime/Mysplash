@@ -1,7 +1,6 @@
 package com.wangdaye.mysplash._common.ui.activity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -15,19 +14,19 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
 import com.wangdaye.mysplash._common.data.entity.unsplash.AccessToken;
 import com.wangdaye.mysplash._common.data.service.AuthorizeService;
-import com.wangdaye.mysplash._common.ui._basic.MysplashActivity;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.widget.SwipeBackCoordinatorLayout;
 import com.wangdaye.mysplash._common.utils.DisplayUtils;
+import com.wangdaye.mysplash._common.utils.helper.ImageHelper;
+import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
 import com.wangdaye.mysplash._common.utils.manager.AuthManager;
 import com.wangdaye.mysplash._common.ui.widget.coordinatorView.StatusBarView;
 import com.wangdaye.mysplash._common.utils.AnimUtils;
-import com.wangdaye.mysplash._common.utils.NotificationUtils;
+import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -37,44 +36,44 @@ import retrofit2.Response;
  * */
 
 public class LoginActivity extends MysplashActivity
-        implements View.OnClickListener, SwipeBackCoordinatorLayout.OnSwipeListener,
-        AuthorizeService.OnRequestAccessTokenListener {
-    // widget
-    private CoordinatorLayout container;
-    private StatusBarView statusBar;
-    private LinearLayout buttonContainer;
-    private RelativeLayout progressContainer;
+    implements View.OnClickListener, SwipeBackCoordinatorLayout.OnSwipeListener,
+    AuthorizeService.OnRequestAccessTokenListener {
+        // widget
+        private CoordinatorLayout container;
+        private StatusBarView statusBar;
+        private LinearLayout buttonContainer;
+        private RelativeLayout progressContainer;
 
-    // data
-    private AuthorizeService service;
+        // data
+        private AuthorizeService service;
 
-    private int state;
-    private final int NORMAL_STATE = 0;
-    private final int AUTH_STATE = 1;
+        private int state;
+        private final int NORMAL_STATE = 0;
+        private final int AUTH_STATE = 1;
 
-    /** <br> life cycle. */
+        /** <br> life cycle. */
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (!isStarted()) {
-            setStarted();
-            initData();
-            initWidget();
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_login);
         }
-    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        service.cancel();
-    }
+        @Override
+        protected void onStart() {
+            super.onStart();
+            if (!isStarted()) {
+                setStarted();
+                initData();
+                initWidget();
+            }
+        }
+
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+            service.cancel();
+        }
 
     @Override
     protected void setTheme() {
@@ -91,14 +90,22 @@ public class LoginActivity extends MysplashActivity
     }
 
     @Override
-    protected boolean needSetStatusBarTextDark() {
+    protected boolean isFullScreen() {
         return true;
     }
 
     @Override
     public void finishActivity(int dir) {
         finish();
-        overridePendingTransition(0, R.anim.activity_slide_out_bottom);
+        switch (dir) {
+            case SwipeBackCoordinatorLayout.UP_DIR:
+                overridePendingTransition(0, R.anim.activity_slide_out_top);
+                break;
+
+            case SwipeBackCoordinatorLayout.DOWN_DIR:
+                overridePendingTransition(0, R.anim.activity_slide_out_bottom);
+                break;
+        }
     }
 
     @Override
@@ -108,7 +115,10 @@ public class LoginActivity extends MysplashActivity
                 && intent.getData() != null
                 && !TextUtils.isEmpty(intent.getData().getAuthority())
                 && Mysplash.UNSPLASH_LOGIN_CALLBACK.equals(intent.getData().getAuthority())) {
-            service.requestAccessToken(intent.getData().getQueryParameter("code"), this);
+            service.requestAccessToken(
+                    Mysplash.getInstance(),
+                    intent.getData().getQueryParameter("code"),
+                    this);
             setState(AUTH_STATE);
         }
     }
@@ -147,10 +157,7 @@ public class LoginActivity extends MysplashActivity
         }
 
         ImageView icon = (ImageView) findViewById(R.id.activity_login_icon);
-        Glide.with(this)
-                .load(R.drawable.ic_launcher)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(icon);
+        ImageHelper.loadIcon(this, icon, R.drawable.ic_launcher);
 
         DisplayUtils.setTypeface(this, ((TextView) findViewById(R.id.activity_login_content)));
 
@@ -207,7 +214,7 @@ public class LoginActivity extends MysplashActivity
 
     /** <br> interface. */
 
-    // on click listener.
+    // on click swipeListener.
 
     @Override
     public void onClick(View view) {
@@ -217,20 +224,18 @@ public class LoginActivity extends MysplashActivity
                 break;
 
             case R.id.activity_login_loginBtn: {
-                Uri uri = Uri.parse(Mysplash.UNSPLASH_LOGIN_URL);
-                startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                IntentHelper.startWebActivity(this, Mysplash.getLoginUrl(this));
                 break;
             }
 
             case R.id.activity_login_joinBtn: {
-                Uri uri = Uri.parse(Mysplash.UNSPLASH_JOIN_URL);
-                startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                IntentHelper.startWebActivity(this, Mysplash.UNSPLASH_JOIN_URL);
                 break;
             }
         }
     }
 
-    // on swipe listener.
+    // on swipe swipeListener.
 
     @Override
     public boolean canSwipeBack(int dir) {
@@ -245,28 +250,20 @@ public class LoginActivity extends MysplashActivity
 
     @Override
     public void onSwipeFinish(int dir) {
-        finish();
-        switch (dir) {
-            case SwipeBackCoordinatorLayout.UP_DIR:
-                overridePendingTransition(0, R.anim.activity_slide_out_top);
-                break;
-
-            case SwipeBackCoordinatorLayout.DOWN_DIR:
-                overridePendingTransition(0, R.anim.activity_slide_out_bottom);
-                break;
-        }
+        finishActivity(dir);
     }
 
-    // on request access token listener.
+    // on request access token swipeListener.
 
     @Override
     public void onRequestAccessTokenSuccess(Call<AccessToken> call, Response<AccessToken> response) {
         if (response.isSuccessful()) {
             AuthManager.getInstance().writeAccessToken(response.body());
             AuthManager.getInstance().refreshPersonalProfile();
+            IntentHelper.startMainActivity(this);
             finish();
         } else {
-            NotificationUtils.showSnackbar(
+            NotificationHelper.showSnackbar(
                     getString(R.string.feedback_request_token_failed),
                     Snackbar.LENGTH_SHORT);
             setState(NORMAL_STATE);
@@ -275,7 +272,7 @@ public class LoginActivity extends MysplashActivity
 
     @Override
     public void onRequestAccessTokenFailed(Call<AccessToken> call, Throwable t) {
-        NotificationUtils.showSnackbar(
+        NotificationHelper.showSnackbar(
                 getString(R.string.feedback_request_token_failed),
                 Snackbar.LENGTH_SHORT);
         setState(NORMAL_STATE);

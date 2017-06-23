@@ -6,6 +6,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
@@ -15,17 +16,13 @@ import android.view.animation.Transformation;
 
 public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
     // widget
-    public OnSwipeListener listener;
+    private OnSwipeListener swipeListener;
 
     // data
     private int swipeDistance = 0;
     private static float SWIPE_TRIGGER = 100;
     private static final float SWIPE_RADIO = 2.5F;
-/*
-    private float touchSlop;
-    private float oldX;
-    private float oldY;
-*/
+
     private int swipeDir = NULL_DIR;
     public static final int NULL_DIR = 0;
     public static final int UP_DIR = 1;
@@ -52,75 +49,6 @@ public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
         SWIPE_TRIGGER = (float) (getResources().getDisplayMetrics().heightPixels / 5.0);
     }
 
-    /** <br> touch. */
-/*
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        super.dispatchTouchEvent(ev);
-        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-            oldX = ev.getX();
-            oldY = ev.getY();
-        }
-        return isEnabled() && listener != null;
-    }
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        super.onInterceptTouchEvent(ev);
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_MOVE:
-                if (Math.abs(ev.getY() - oldY) < touchSlop) {
-                    oldX = ev.getX();
-                    oldY = ev.getY();
-                    return false;
-                } else if (ev.getY() > oldY
-                        && Math.abs(ev.getX() - oldX) < Math.abs(ev.getY() - oldY)) {
-                    // swipe down.
-                    if (swipeDistance == 0 && !listener.canSwipeBack(DOWN_DIR)) {
-                        oldX = ev.getX();
-                        oldY = ev.getY();
-                        return false;
-                    } else {
-                        return true;
-                    }
-                } else if (ev.getY() < oldY
-                        && Math.abs(ev.getX() - oldX) < Math.abs(ev.getY() - oldY)) {
-                    // swipe up.
-                    if (swipeDistance == 0 && !listener.canSwipeBack(UP_DIR)) {
-                        oldX = ev.getX();
-                        oldY = ev.getY();
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }
-                break;
-
-            case MotionEvent.ACTION_UP:
-                return swipeDistance != 0;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        super.onTouchEvent(ev);
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_MOVE:
-                onSwipe(ev.getY());
-                return true;
-
-            case MotionEvent.ACTION_UP:
-                if (Math.abs(swipeDistance) >= SWIPE_TRIGGER) {
-                    swipeBack();
-                } else {
-                    reset();
-                }
-                return true;
-        }
-        return false;
-    }
-*/
     /** <br> nested scroll. */
 
     @Override
@@ -150,7 +78,7 @@ public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
         int newDyUnconsumed = dyUnconsumed;
         if (swipeDistance == 0) {
             int dir = dyUnconsumed < 0 ? DOWN_DIR : UP_DIR;
-            if (listener.canSwipeBack(dir)) {
+            if (swipeListener != null && swipeListener.canSwipeBack(dir)) {
                 onScroll(dyUnconsumed);
                 newDyConsumed = dyConsumed + dyUnconsumed;
                 newDyUnconsumed = 0;
@@ -171,24 +99,7 @@ public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
     }
 
     /** <br> UI. */
-/*
-    private void onSwipe(float newY) {
-        if (swipeDistance * (newY - oldY) < 0) {
-            swipeDistance = 0;
-            swipeDir = NULL_DIR;
-        } else {
-            swipeDistance = (int) (newY - oldY);
-        }
 
-        if (swipeDistance != 0) {
-            swipeDir = swipeDistance > 0 ? DOWN_DIR : UP_DIR;
-        } else {
-            swipeDir = NULL_DIR;
-        }
-
-        setSwipeTranslation();
-    }
-*/
     private int onPreScroll(int dy) {
         int consumed;
         if (swipeDistance * (swipeDistance - dy) < 0) {
@@ -213,8 +124,8 @@ public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
     }
 
     private void swipeBack() {
-        if (listener != null) {
-            listener.onSwipeFinish(swipeDir);
+        if (swipeListener != null) {
+            swipeListener.onSwipeFinish(swipeDir);
         }
     }
 
@@ -222,16 +133,17 @@ public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
         swipeDir = NULL_DIR;
         if (swipeDistance != 0) {
             ResetAnimation a = new ResetAnimation(swipeDistance);
+            a.setDuration((long) (100.0 + 200.0 * Math.abs(swipeDistance) / SWIPE_TRIGGER));
+            a.setInterpolator(new AccelerateDecelerateInterpolator());
             a.setAnimationListener(resetAnimListener);
-            a.setDuration(300);
             startAnimation(a);
         }
     }
 
     private void setSwipeTranslation() {
         setTranslationY((float) (1.0 * swipeDistance / SWIPE_RADIO));
-        if (listener != null) {
-            listener.onSwipeProcess(
+        if (swipeListener != null) {
+            swipeListener.onSwipeProcess(
                     (float) Math.min(
                             1,
                             Math.abs(1.0 * swipeDistance / SWIPE_TRIGGER)));
@@ -310,6 +222,8 @@ public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
 
     /** <br> interface. */
 
+    // on swipe listener.
+
     public interface OnSwipeListener {
         boolean canSwipeBack(int dir);
         void onSwipeProcess(float percent);
@@ -317,6 +231,6 @@ public class SwipeBackCoordinatorLayout extends CoordinatorLayout {
     }
 
     public void setOnSwipeListener(OnSwipeListener l) {
-        this.listener = l;
+        this.swipeListener = l;
     }
 }

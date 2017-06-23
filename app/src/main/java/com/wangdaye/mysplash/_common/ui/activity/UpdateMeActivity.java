@@ -21,12 +21,12 @@ import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
 import com.wangdaye.mysplash._common.data.entity.unsplash.Me;
 import com.wangdaye.mysplash._common.data.service.UserService;
-import com.wangdaye.mysplash._common.ui._basic.MysplashActivity;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.ui.widget.SwipeBackCoordinatorLayout;
 import com.wangdaye.mysplash._common.utils.DisplayUtils;
 import com.wangdaye.mysplash._common.utils.manager.AuthManager;
 import com.wangdaye.mysplash._common.ui.widget.coordinatorView.StatusBarView;
-import com.wangdaye.mysplash._common.utils.NotificationUtils;
+import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
 import com.wangdaye.mysplash._common.utils.widget.SafeHandler;
 
 import java.util.Timer;
@@ -126,7 +126,7 @@ public class UpdateMeActivity extends MysplashActivity
     }
 
     @Override
-    protected boolean needSetStatusBarTextDark() {
+    protected boolean isFullScreen() {
         return true;
     }
 
@@ -150,7 +150,7 @@ public class UpdateMeActivity extends MysplashActivity
             finishActivity(SwipeBackCoordinatorLayout.DOWN_DIR);
         } else if (state == INPUT_STATE) {
             backPressed = true;
-            NotificationUtils.showSnackbar(
+            NotificationHelper.showSnackbar(
                     getString(R.string.feedback_click_again_to_exit),
                     Snackbar.LENGTH_SHORT);
 
@@ -308,7 +308,7 @@ public class UpdateMeActivity extends MysplashActivity
                     this);
             setState(UPDATE_STATE);
         } else {
-            NotificationUtils.showSnackbar(
+            NotificationHelper.showSnackbar(
                     getString(R.string.feedback_name_is_required),
                     Snackbar.LENGTH_SHORT);
         }
@@ -342,7 +342,7 @@ public class UpdateMeActivity extends MysplashActivity
 
     /** <br> interface. */
 
-    // on click listener.
+    // on click swipeListener.
 
     @Override
     public void onClick(View view) {
@@ -357,7 +357,7 @@ public class UpdateMeActivity extends MysplashActivity
         }
     }
 
-    // on swipe listener.
+    // on swipe swipeListener.
 
     @Override
     public boolean canSwipeBack(int dir) {
@@ -375,7 +375,7 @@ public class UpdateMeActivity extends MysplashActivity
         finishActivity(dir);
     }
 
-    // on request me profile listener.
+    // on request me profile swipeListener.
 
     @Override
     public void onRequestMeProfileSuccess(Call<Me> call, Response<Me> response) {
@@ -385,7 +385,7 @@ public class UpdateMeActivity extends MysplashActivity
             overridePendingTransition(0, R.anim.activity_slide_out_bottom);
         } else {
             setState(INPUT_STATE);
-            NotificationUtils.showSnackbar(
+            NotificationHelper.showSnackbar(
                     getString(R.string.feedback_update_profile_failed),
                     Snackbar.LENGTH_SHORT);
         }
@@ -394,7 +394,7 @@ public class UpdateMeActivity extends MysplashActivity
     @Override
     public void onRequestMeProfileFailed(Call<Me> call, Throwable t) {
         setState(INPUT_STATE);
-        NotificationUtils.showSnackbar(
+        NotificationHelper.showSnackbar(
                 getString(R.string.feedback_update_profile_failed),
                 Snackbar.LENGTH_SHORT);
     }

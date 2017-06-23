@@ -3,11 +3,15 @@ package com.wangdaye.mysplash.me.view.widget;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.transition.TransitionManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -17,25 +21,25 @@ import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.wangdaye.mysplash.Mysplash;
 import com.wangdaye.mysplash.R;
 import com.wangdaye.mysplash._common.data.entity.unsplash.Me;
+import com.wangdaye.mysplash._common.ui.widget.nestedScrollView.NestedScrollAppBarLayout;
+import com.wangdaye.mysplash._common.ui.widget.rippleButton.RippleButton;
 import com.wangdaye.mysplash._common.utils.DisplayUtils;
+import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
 import com.wangdaye.mysplash._common.utils.manager.AuthManager;
 import com.wangdaye.mysplash._common.i.model.LoadModel;
 import com.wangdaye.mysplash._common.i.presenter.LoadPresenter;
 import com.wangdaye.mysplash._common.i.view.LoadView;
-import com.wangdaye.mysplash._common.ui.adapter.MyPagerAdapter;
 import com.wangdaye.mysplash._common.utils.AnimUtils;
 import com.wangdaye.mysplash.me.model.widget.LoadObject;
 import com.wangdaye.mysplash.me.presenter.widget.LoadImplementor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Me profile view.
  * */
 
 public class MeProfileView  extends FrameLayout
-        implements LoadView {
+        implements LoadView,
+        RippleButton.OnSwitchListener {
     // model.
     private LoadModel loadModel;
 
@@ -43,6 +47,7 @@ public class MeProfileView  extends FrameLayout
     private CircularProgressView progressView;
 
     private RelativeLayout profileContainer;
+    private RippleButton rippleButton;
     private TextView locationTxt;
     private TextView bioTxt;
 
@@ -96,6 +101,10 @@ public class MeProfileView  extends FrameLayout
         this.progressView = (CircularProgressView) findViewById(R.id.container_user_profile_progressView);
         progressView.setVisibility(VISIBLE);
 
+        this.rippleButton = (RippleButton) findViewById(R.id.container_user_profile_followBtn);
+        rippleButton.setDontAnimate(true);
+        rippleButton.setOnSwitchListener(this);
+
         this.profileContainer = (RelativeLayout) findViewById(R.id.container_user_profile_profileContainer);
         profileContainer.setVisibility(GONE);
 
@@ -117,7 +126,18 @@ public class MeProfileView  extends FrameLayout
     // interface.
 
     @SuppressLint("SetTextI18n")
-    public void drawMeProfile(Me me, MyPagerAdapter adapter) {
+    public void drawMeProfile(Me me) {
+        ViewParent parent = getAppBarParent();
+        if (parent != null && parent instanceof NestedScrollAppBarLayout) {
+            TransitionManager.beginDelayedTransition((ViewGroup) parent);
+        }
+
+        rippleButton.forceSwitch(true);
+        rippleButton.setButtonTitles(
+                new String[] {
+                        getContext().getString(R.string.my_follow).toUpperCase(),
+                        getContext().getString(R.string.my_follow).toUpperCase()});
+
         if (!TextUtils.isEmpty(me.location)) {
             locationTxt.setText(me.location);
         } else {
@@ -130,28 +150,16 @@ public class MeProfileView  extends FrameLayout
             bioTxt.setVisibility(GONE);
         }
 
-        List<String> titleList = new ArrayList<>();
-        titleList.add(me.total_photos + " " + getResources().getStringArray(R.array.user_tabs)[0]);
-        titleList.add(me.total_collections + " " + getResources().getStringArray(R.array.user_tabs)[1]);
-        titleList.add(me.total_likes + " " + getResources().getStringArray(R.array.user_tabs)[2]);
-        adapter.titleList = titleList;
-        adapter.notifyDataSetChanged();
-
         loadPresenter.setNormalState();
     }
 
-    public void addCollection(MyPagerAdapter adapter) {
-        if (AuthManager.getInstance().getMe() != null) {
-            AuthManager.getInstance().getMe().total_collections ++;
-            drawMeProfile(AuthManager.getInstance().getMe(), adapter);
+    @Nullable
+    private ViewParent getAppBarParent() {
+        ViewParent parent = getParent();
+        while (parent != null && !(parent instanceof NestedScrollAppBarLayout)) {
+            parent = parent.getParent();
         }
-    }
-
-    public void cutCollection(MyPagerAdapter adapter) {
-        if (AuthManager.getInstance().getMe() != null) {
-            AuthManager.getInstance().getMe().total_collections --;
-            drawMeProfile(AuthManager.getInstance().getMe(), adapter);
-        }
+        return parent;
     }
 
     public void setLoading() {
@@ -167,6 +175,15 @@ public class MeProfileView  extends FrameLayout
     }
 
     /** <br> interface. */
+
+    // on switch swipeListener.
+
+    @Override
+    public void onSwitch(boolean switchTo) {
+        if (AuthManager.getInstance().isAuthorized()) {
+            IntentHelper.startMyFollowActivity(Mysplash.getInstance().getTopActivity());
+        }
+    }
 
     // view.
 
@@ -184,8 +201,7 @@ public class MeProfileView  extends FrameLayout
 
     @Override
     public void setLoadingState() {
-        animShow(progressView);
-        animHide(profileContainer);
+        // do nothing.
     }
 
     @Override

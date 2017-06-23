@@ -21,10 +21,10 @@ import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.wangdaye.mysplash.R;
 import com.wangdaye.mysplash._common.data.entity.unsplash.Collection;
 import com.wangdaye.mysplash._common.data.service.CollectionService;
-import com.wangdaye.mysplash._common.ui._basic.MysplashDialogFragment;
+import com.wangdaye.mysplash._common._basic.MysplashDialogFragment;
 import com.wangdaye.mysplash._common.utils.AnimUtils;
 import com.wangdaye.mysplash._common.utils.DisplayUtils;
-import com.wangdaye.mysplash._common.utils.NotificationUtils;
+import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -107,7 +107,7 @@ public class UpdateCollectionDialog extends MysplashDialogFragment
         descriptionTxt.setText(collection.description == null ? "" : collection.description);
 
         this.checkBox = (CheckBox) v.findViewById(R.id.dialog_update_collection_checkBox);
-        checkBox.setSelected(collection.privateX);
+        checkBox.setChecked(collection.privateX);
         DisplayUtils.setTypeface(getActivity(), checkBox);
 
         this.baseBtnContainer = (RelativeLayout) v.findViewById(R.id.dialog_update_collection_baseBtnContainer);
@@ -176,13 +176,13 @@ public class UpdateCollectionDialog extends MysplashDialogFragment
     }
 
     private void notifyUpdateFailed() {
-        NotificationUtils.showSnackbar(
+        NotificationHelper.showSnackbar(
                 getString(R.string.feedback_update_collection_failed),
                 Toast.LENGTH_SHORT);
     }
 
     private void notifyDeleteFailed() {
-        NotificationUtils.showSnackbar(
+        NotificationHelper.showSnackbar(
                 getString(R.string.feedback_delete_collection_failed),
                 Toast.LENGTH_SHORT);
     }
@@ -208,7 +208,7 @@ public class UpdateCollectionDialog extends MysplashDialogFragment
         } else {
             String description = TextUtils.isEmpty(descriptionTxt.getText().toString()) ?
                     null : descriptionTxt.getText().toString();
-            boolean privateX = checkBox.isSelected();
+            boolean privateX = checkBox.isChecked();
             service.updateCollection(
                     collection.id,
                     title,
@@ -259,7 +259,7 @@ public class UpdateCollectionDialog extends MysplashDialogFragment
         }
     }
 
-    // on request a collection listener.
+    // on request a collection swipeListener.
 
     @Override
     public void onRequestACollectionSuccess(Call<Collection> call, Response<Collection> response) {
@@ -280,7 +280,7 @@ public class UpdateCollectionDialog extends MysplashDialogFragment
         notifyUpdateFailed();
     }
 
-    // on delete collection listener.
+    // on delete collection swipeListener.
 
     @Override
     public void onDeleteCollectionSuccess(Call<ResponseBody> call, Response<ResponseBody> response) {

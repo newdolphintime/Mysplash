@@ -5,12 +5,13 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 
 import com.wangdaye.mysplash.R;
-import com.wangdaye.mysplash._common.ui._basic.MysplashActivity;
+import com.wangdaye.mysplash._common._basic.MysplashActivity;
 import com.wangdaye.mysplash._common.utils.helper.IntentHelper;
 import com.wangdaye.mysplash._common.utils.manager.AuthManager;
 import com.wangdaye.mysplash._common.i.presenter.MeManagePresenter;
 import com.wangdaye.mysplash._common.i.view.MeManageView;
-import com.wangdaye.mysplash._common.utils.NotificationUtils;
+import com.wangdaye.mysplash._common.utils.helper.NotificationHelper;
+import com.wangdaye.mysplash.user.view.activity.UserActivity;
 
 /**
  * Me manage implementor.
@@ -35,7 +36,8 @@ public class MeManageImplementor
         View header = nav.getHeaderView(0);
         IntentHelper.startMeActivity(
                 a,
-                header.findViewById(R.id.container_nav_header_avatar));
+                header.findViewById(R.id.container_nav_header_avatar),
+                UserActivity.PAGE_PHOTO);
     }
 
     @Override
@@ -49,7 +51,7 @@ public class MeManageImplementor
 
     @Override
     public void responseWriteAccessToken() {
-        NotificationUtils.showSnackbar(
+        NotificationHelper.showSnackbar(
                 "Welcome back.",
                 Snackbar.LENGTH_SHORT);
         view.drawMeAvatar();

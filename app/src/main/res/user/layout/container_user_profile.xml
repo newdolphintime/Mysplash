@@ -20,8 +20,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <com.wangdaye.mysplash._common.ui.widget.rippleButton.RippleButton
+            android:id="@+id/container_user_profile_followBtn"
+            android:layout_width="128dp"
+            android:layout_height="@dimen/little_icon_size"
+            android:layout_marginTop="@dimen/normal_margin"
+            android:layout_centerHorizontal="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:stateListAnimator="@animator/touch_rise_mini"
+            app:rb_title_off="@string/follow"
+            app:rb_title_on="@string/following"
+            tools:ignore="UnusedAttribute" />
+
         <RelativeLayout
             android:id="@+id/container_user_profile_locationContainer"
+            android:layout_below="@id/container_user_profile_followBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/normal_icon_size"
@@ -60,7 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_centerInParent="true"
             android:lineSpacingMultiplier="1.3"
-            android:textIsSelectable="true"
+            android:textIsSelectable="false"
             style="@style/content_text"
             tools:text="Do not go gentle into that good night, Old age should burn and rave at close of day; Rage, rage against the dying of the light." />
 
